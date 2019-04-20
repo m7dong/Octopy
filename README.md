@@ -1,1 +1,1 @@
-# Octopy
+![Octopy](./doc/figures/LOGO.png)
