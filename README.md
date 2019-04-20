@@ -1,1 +1,4 @@
-![Octopy](./doc/figures/LOGO.png)
+<p align="center">
+<img src="./doc/figures/LOGO.png" alt="alt text" width="250">
+</p>
+Octopy is an efficient framework for parallel simulation of Federated Learning atop Pytorch.
