@@ -8,7 +8,7 @@ def get_dataloader():
     return dataset_train, dataset_test
 
 
-def lunch_training_on_different_gpu(model):
+def launch_training_on_different_gpu(model):
     num_users = 20
     num_of_gpus = 2
     num_of_models_per_gpu = 2
