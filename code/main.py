@@ -4,7 +4,7 @@ from warehouse.funcs import *
 from GPUContainer import GPU_Container
 
 import torch
-from config import Config
+from Config import Config
 
 # Initialize global models and partial models 
 def initialize_models(num_gpu, num_local):
