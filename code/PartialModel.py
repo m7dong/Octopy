@@ -10,7 +10,8 @@ class Partial_Model:
         """
         self.capacity = capacity # how many local models specified in the same GPU
         self.state_dict = state_dict # weights of partial model
-        self.true_global = global_model
+        self.global_model = global_model
+        self.true_global = self.global_model.state_dict
 
 
     def partial_updates_sum(self, w_in):
@@ -21,5 +22,6 @@ class Partial_Model:
         return self.state_dict
 
     def pull_global(self):
-        self.true_global = global_model.Update_True()
+        assert self.global_model.incre_counter = 0   # make sure that global is the true global
+        self.true_global = self.global_model.state_dict
 
