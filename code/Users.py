@@ -16,24 +16,26 @@ class User(object):
 		self.learning_rate = learning_rate
 		self.local_batchsize = local_batchsize
 		self.local_epoch = local_epoch
-        self.net = ready_model
-        self.device = next(self.net.parameters()).device
+		self.net = ready_model
+		self.device = next(self.net.parameters()).device
 
 		self.local_train_loader, self.local_test_loader = get_dataloader()  # just for testing
 
 	def local_train(self):
-        model = self.net
+		model = self.net
 		model.train()
 		optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
-        train_loader = self.local_train_loader
+		train_loader = self.local_train_loader
 
 		for epoch in range(1, self.local_epoch + 1):
-            for batch_idx, (data, target) in enumerate(train_loader):
-                data, target = data.to(device), target.to(device)
-                optimizer.zero_grad()
-                output = model(data)
-                loss = F.nll_loss(output, target)
-                loss.backward()
-                optimizer.step()
+			for batch_idx, (data, target) in enumerate(train_loader):
+				data, target = data.to(device), target.to(device)
+				optimizer.zero_grad()
+				output = model(data)
+				loss = F.nll_loss(output, target)
+				loss.backward()
+				optimizer.step()
+				
+		
 
 
