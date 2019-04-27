@@ -4,6 +4,7 @@ from warehouse.funcs import *
 from GPUContainer import GPU_Container
 
 import torch
+from config import Config
 
 def initialize_models(num_gpu, num_local):
     # initialize global model on CPU
@@ -21,13 +22,14 @@ def initialize_models(num_gpu, num_local):
 
 
 def main():
+    config = Config().parse_args()
     # load data
     dataset_train, dataset_test = get_dataloader()
 
     # initialize models
-    num_gpu, num_local = 8, 3
-    global_model, partial_model = initialize_models(num_gpu, num_local)
-    coordinator = clients_coordinator(clients_list = list(range(int(20))), num_of_gpus = num_of_gpus)   
+    global_model, partial_model = initialize_models(config.num_gpu, config.num_local_models_per_gpu)
+    coordinator = clients_coordinator(clients_list = list(range(int(config.num_users))), 
+                    num_of_gpus = config.num_gpu)   
 
     GPU_Containers = []
     for gpu_idx, users in coordinator.items():
