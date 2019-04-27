@@ -1,5 +1,6 @@
 #local2partial within the same GPU
 import torch
+from Lenet import Net
 
 #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -13,6 +14,8 @@ class Partial_Model:
         self.global_model = global_model
         self.true_global = self.global_model.state_dict
 
+        self.local_model = Net()
+        self.local_model_list = [self.local_model] * self.capacity
 
     def partial_updates_sum(self, w_in):
         #w_in represents weights from a local model

@@ -1,15 +1,11 @@
 from GlobalModel import Global_Model
 from PartialModel import Partial_Model
-from Lenet import Net
 from warehouse.funcs import *
+from GPUContainer import GPU_Container
 
 import torch
 
-def initialize_models(num_of_gpus):
-    local_net1, local_net2, local_net3 = Net, Net, Net
-    model_list = [local_net1, local_net2, local_net3]
-    num_of_local = len(model_list)
-
+def initialize_models(num_gpu, num_local):
     # initialize global model on CPU
     global_net = Net()
     global_model = Global_Model(state_dict = global_net.state_dict, capacity = num_of_gpus)
@@ -17,14 +13,9 @@ def initialize_models(num_of_gpus):
     # NOTE: Once partial global on i-th device processed len(coordinator[i]) local clients,
     #       it can call global_model.Incre_FedAvg(partial_global's state_dict)
     
-    # Note: test codes
-    # one local
     # initialize partial models on GPU
     init_dict = torch.zeros(5, 3, dtype=torch.long)
     partial_model = Partial_Model(state_dict = init_dict, capacity = num_of_local, global_model=global_model)
-    for i in range(len(model_list)):
-        net = model_list[i]()
-        #partial_model.partial_updates_sum(net.state_dict)
 
     return global_model, partial_model
 
@@ -34,9 +25,14 @@ def main():
     dataset_train, dataset_test = get_dataloader()
 
     # initialize models
-    num_of_gpus = 8
-    global_model, partial_model = initialize_models(num_of_gpus)
+    num_gpu, num_local = 8, 3
+    global_model, partial_model = initialize_models(num_gpu, num_local)
     coordinator = clients_coordinator(clients_list = list(range(int(20))), num_of_gpus = num_of_gpus)   
+
+    GPU_Containers = []
+    for gpu_idx, users in coordinator.items():
+        GPU_Containers.append(GPUContainer(partial_model, users))
+
 
     total_rounds = 10
     for t in range(total_rounds):
