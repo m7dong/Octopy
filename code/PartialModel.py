@@ -89,7 +89,7 @@ if __name__ == '__main__':
         #read in user
         #....
         #.....
-    #to avoid times of initializing processes, only generates k/10 processes.
+    #to avoid too many times of initializing processes, only generates k/10 processes.
     for num in range(k/10):
         Process(target=update_partial_sum, args=(lock, user_list_k, partial_model)).start()
 
