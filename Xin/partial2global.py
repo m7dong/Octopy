@@ -22,39 +22,12 @@ class Global_Model:
         self.round += (self.incre_counter / self.capacity)
         self.incre_counter %= self.capacity
         return self.state_dict
+
+    def Update_True(self, model, gpu_index):
+        model = model.to(gpu_index)
+
+        return model
+
+
         
-def clients_coordinator(clients_list, num_of_gpus):
-    '''
-    Input: 
-        clients_list: list of clients' index to train
-        num_of_gpus: how many gpus we can use to train
-    Output:
-        Dict: key is index of gpu, value is clients' index for this gpu.
-    '''
-    coordinator = {}
-    splited_clients_list = chunkIt(clients_list, num_of_gpus)
-    for i in range(num_of_gpus):
-        coordinator[i] = splited_clients_list[i]
-    return coordinator
-
-
-def chunkIt(seq, num):
-  avg = len(seq) / float(num)
-  out = []
-  last = 0.0
-
-  while last < len(seq):
-    out.append(seq[int(last):int(last + avg)])
-    last += avg
-
-  return out
-
-if __name__ == '__main__':
-    # NOTE: test codes
-    from Lenet import Net
-    net = Net()
-    num_of_gpus = 8
-    global_model = Global_Model(state_dict = net.state_dict, capacity = num_of_gpus)
-    coordinator = clients_coordinator(clients_list = list(range(int(20))), num_of_gpus = num_of_gpus)
-    # NOTE: Once partial global on i-th device processed len(coordinator[i]) local clients,
-    #       it can call global_model.Incre_FedAvg(partial_global's state_dict)
+    

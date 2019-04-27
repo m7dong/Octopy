@@ -66,3 +66,33 @@ def Incre_FedAvg(w_in, w_avg, counter):
         w_avg[k] += torch.div(w_in[k], counter)
         w_avg[k] = torch.div(w_avg[k], 1/counter+1)
     return w_avg
+
+
+def clients_coordinator(clients_list, num_of_gpus):
+    '''
+    Input: 
+        clients_list: list of clients' index to train
+        num_of_gpus: how many gpus we can use to train
+    Output:
+        Dict: key is index of gpu, value is clients' index for this gpu.
+    '''
+    coordinator = {}
+    splited_clients_list = chunkIt(clients_list, num_of_gpus)
+    for i in range(num_of_gpus):
+        coordinator[i] = splited_clients_list[i]
+    return coordinator
+
+
+def chunkIt(seq, num):
+  avg = len(seq) / float(num)
+  out = []
+  last = 0.0
+
+  while last < len(seq):
+    out.append(seq[int(last):int(last + avg)])
+    last += avg
+
+  return out
+
+
+  
