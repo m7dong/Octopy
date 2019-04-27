@@ -1,7 +1,7 @@
 from GlobalModel import Global_Model
 from PartialModel import Partial_Model
 from Lenet import Net
-from funcs import *
+from warehouse.funcs import *
 
 import torch
 
