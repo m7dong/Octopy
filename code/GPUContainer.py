@@ -7,9 +7,11 @@ import torch.multiprocessing as mp
 def launch_one_processing(processing_index, partial_model, device, user_list_for_processings):
     ready_model = Net().load_state_dict(partial_model.true_global).to(device)
     for user_index in user_list_for_processings[processing_index]:
+        ready_model.load_state_dict(partial_model.true_global)
         current_user = User(user_index=user_index, ready_model=ready_model)
         current_user.local_train()
         #TODO: how to push local model (subprocessing N) to partial global (main processing)
+        
 
 
 class GPU_Container:
