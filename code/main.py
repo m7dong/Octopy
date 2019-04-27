@@ -5,6 +5,7 @@ from GPUContainer import GPU_Container
 
 import torch
 
+# Initialize global models and partial models 
 def initialize_models(num_gpu, num_local):
     # initialize global model on CPU
     global_net = Net()
@@ -21,8 +22,6 @@ def initialize_models(num_gpu, num_local):
 
 
 def main():
-    # load data
-    dataset_train, dataset_test = get_dataloader()
 
     # initialize models
     num_gpu, num_local = 8, 3
@@ -32,7 +31,6 @@ def main():
     GPU_Containers = []
     for gpu_idx, users in coordinator.items():
         GPU_Containers.append(GPUContainer(partial_model, users))
-
 
     total_rounds = 10
     for t in range(total_rounds):
