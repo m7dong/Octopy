@@ -22,6 +22,6 @@ class Partial_Model:
         return self.state_dict
 
     def pull_global(self):
-        assert self.global_model.incre_counter = 0   # make sure that global is the true global
+        assert self.global_model.incre_counter == 0   # make sure that global is the true global
         self.true_global = self.global_model.state_dict
 
