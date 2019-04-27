@@ -91,7 +91,7 @@ if __name__ == '__main__':
         #.....
     #to avoid times of initializing processes, only generates k/10 processes.
     for num in range(k/10):
-        Process(target=update_partial_sum, args=(lock, user_list, partial_model)).start()
+        Process(target=update_partial_sum, args=(lock, user_list_k, partial_model)).start()
 
     for k in partial_model.state_dict.keys():
         partial_model.local_model[k] = torch.div(partial_model.state_dict[k], partial_model.capacity)
