@@ -26,7 +26,7 @@ class GPU_Container:
             
     def launch_gpu(self, pool):
         for processing_index in range(self.gpu_parallel):
-            pool.apply_async(lunch_one_processing, \
+            pool.apply_async(launch_one_processing, \
                     args=(processing_index, self.partial_model, self.device, self.user_list_for_processing))
 
 if __name__ == '__main__':
