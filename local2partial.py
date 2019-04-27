@@ -1,7 +1,7 @@
 #local2partial within the same GPU
 import torch
+from multiprocessing import Process, Lock
 
-#device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Partial_Model:
     def __init__(self, state_dict, capacity):
@@ -18,21 +18,37 @@ class Partial_Model:
             self.state_dict[k] += w_in[k]
         
         return self.state_dict
-            
-    if __name__ == '__main__':
-        # Note: test codes
-        # one local
-        from Lenet import Net1, Net2, Net3
-        model_list = [Net1, Net2, Net3]
-        num_of_local = len(model_list)
-        #initialize
-        init_dict = torch.zeros(5, 3, dtype=torch.long)
-        partial_model = Partial_Model(state_dict = init_dict, capacity = num_of_local)
-        for i in range(len(model_list)):
-            net = model_list[i]()
-            partial_model.partial_updates_sum(net.state_dict)
-        #calculate avg
-        for k in partial_model.state_dict.keys():
-            partial_model.state_dict[k] = torch.div(partial_model.state_dict[k], partial_model.capacity)
 
-        #update to global model
+
+def update_partial_sum(l, user_list_, partial_model_):
+    l.acquire()
+    try:
+        for i in user_list_:
+            partial_model_.partial_updates_sum(i)
+    finally:
+        l.release()
+
+if __name__ == '__main__':
+    # Note: test codes
+    # number of local = k
+    
+    from Lenet import Net
+    from multiprocessing import Process, Lock
+    
+    init_dict = torch.zeros(5, 3, dtype=torch.long)
+    partial_model=Partial_Model(state_dict = init_dict, capacity = num_of_local)
+    number_of_local = k
+    model_list=[]
+    lock = Lock()
+    for i in range(k):
+        #read in user
+        #....
+        #.....
+    #to avoid times of initializing processes, only generates k/10 processes.
+    for num in range(k/10):
+        Process(target=update_partial_sum, args=(lock, user_list, partial_model)).start()
+
+    for k in partial_model.state_dict.keys():
+        partial_model.state_dict[k] = torch.div(partial_model.state_dict[k], partial_model.capacity)
+
+#update to global model
