@@ -4,7 +4,7 @@ from Users import User
 from Lenet import Net
 import torch.multiprocessing as mp
 
-def lunch_one_processing(processing_index, partial_model, device, user_list_for_processings):
+def launch_one_processing(processing_index, partial_model, device, user_list_for_processings):
     ready_model = Net().load_state_dict(partial_model.true_global).to(device)
     for user_index in user_list_for_processings[processing_index]:
         current_user = User(user_index=user_index, ready_model=ready_model)
@@ -24,7 +24,7 @@ class GPU_Container:
     def split_for_processings(self):
         self.user_list_for_processings = chunkIt(self.users, self.gpu_parallel)
             
-    def lunch_gpu(self, pool):
+    def launch_gpu(self, pool):
         for processing_index in range(self.gpu_parallel):
             pool.apply_async(lunch_one_processing, \
                     args=(processing_index, self.partial_model, self.device, self.user_list_for_processing))
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     pool = mp.Pool()
     for i in range(num_gpus):
         gpu_container = GPU_Container(user_list, global_model, gpu_parallel=4, device=i)
-        gpu_container.lunch_gpu(pool)
+        gpu_container.launch_gpu(pool)
         
 
         
