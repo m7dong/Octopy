@@ -38,6 +38,9 @@ def main():
     assert len(GPU_Containers) == config.num_gpu
     for gpu_launcher in GPU_Containers:
         gpu_launcher.launch_gpu(pool)
+        
+    pool.close()
+    pool.join()
     
         
 
