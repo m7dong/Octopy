@@ -30,6 +30,10 @@ class GPU_Container:
         
     def split_for_processings(self):
         self.user_list_for_processings = chunkIt(self.users, self.gpu_parallel)
+        
+    def update_users(self, users):
+        self.users = users
+        self.split_for_processing()
             
     def launch_gpu(self, pool):
         for processing_index in range(self.gpu_parallel):
