@@ -4,19 +4,16 @@ from multiprocessing import Process, Lock
 #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Partial_Model:
-    def __init__(self, gpu_index, capacity, global_model):
+    def __init__(self, device, capacity, global_model):
         """
         capacity = num of local models
         """
-        self.gpu = gpu_index #which gpu this Partial_Model is located
+        self.device = device #which gpu this Partial_Model is located
         self.state_dict = global_model.state_dict # weights of partial model
         self.capacity = capacity # how many local models specified in the same GPU
         self.global_model = global_model
-        self.true_global = self.global_model.state_dict
-        self.state_dict.to(gpu_index)
-
-        self.local_model = Net()
-        self.local_model_list = [self.local_model] * self.capacity
+        self.true_global = global_model.state_dict
+        self.state_dict.to(self.device)  # TODO: it will return an error.
         
     def partial_updates_sum(self, w_in):
         #w_in represents weights from a local model
