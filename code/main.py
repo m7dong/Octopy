@@ -1,56 +1,45 @@
+import torch
+import torch.multiprocessing as mp
+
 from GlobalModel import Global_Model
 from PartialModel import Partial_Model
 from warehouse.funcs import *
 from GPUContainer import GPU_Container
-
-import torch
 from Config import Config
 
-# Initialize global models and partial models 
+
+
 def initialize_models(num_gpu, num_local):
     # initialize global model on CPU
     global_net = Net()
     global_model = Global_Model(state_dict = global_net.state_dict, capacity = num_of_gpus)
     
     # NOTE: Once partial global on i-th device processed len(coordinator[i]) local clients,
-    #       it can call global_model.Incre_FedAvg(partial_global's state_dict)
-    
-    # initialize partial models on GPU
-    init_dict = torch.zeros(5, 3, dtype=torch.long)
-    partial_model = Partial_Model(state_dict = init_dict, capacity = num_of_local, global_model=global_model)
-
-    return global_model, partial_model
+    #       it can call global_model.Incre_FedAvg(partial_global's state_dict
+    return global_model
 
 
 def main():
     config = Config().parse_args()
 
-    # initialize models
-    global_model, partial_model = initialize_models(config.num_gpu, config.num_local_models_per_gpu)
+    # initialize global model
+    global_model = initialize_models(config.num_gpu, config.num_local_models_per_gpu)
     coordinator = clients_coordinator(clients_list = list(range(int(config.num_users))), 
                     num_of_gpus = config.num_gpu)   
 
     GPU_Containers = []
     for gpu_idx, users in coordinator.items():
-        GPU_Containers.append(GPUContainer(partial_model, users))
-
-    total_rounds = 10
-    for t in range(total_rounds):
-        # pull global to true global on each GPU
-        if t > 0:
-            while global_model.incre_counter != 0:
-                continue
-            partial_model.pull_global()
-
-        # step training
-        launch_training_on_different_gpu()
+        GPU_Containers.append(GPUContainer(users = users, global_model=global_model, \
+                                           gpu_parallel = config.num_local_models_per_gpu, 
+                                           device = torch.device('cuda:'+str(gpu_idx))))
     
-        # calculate avg
-        for k in partial_model.state_dict.keys():
-            partial_model.state_dict[k] = torch.div(partial_model.state_dict[k], partial_model.capacity)
-
-        # update global model on CPU
-        global_model.Incre_FedAvg(partial_global.state_dict)
+    pool = mp.Pool()
+    
+    assert len(GPU_Containers) == config.num_gpu
+    for gpu_launcher in GPU_Containers:
+        gpu_launcher.launch_gpu(pool)
+    
+        
 
 
 
