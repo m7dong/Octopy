@@ -6,7 +6,7 @@ class Config():
         self.parser.add_argument('--num_gpu', type=int,
                                  default=8, help='Number of GPUs')
         self.parser.add_argument('--num_local_models_per_gpu', type=int,
-                                 default=8, help='Number of local models per CPU')
+                                 default=8, help='Number of local models per GPU')
         self.parser.add_argument('--num_users', type=int,
                                  default=100, help='Total number of users')
         self.parser.add_argument('--num_steps', type=int,
