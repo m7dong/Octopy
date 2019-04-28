@@ -23,10 +23,6 @@ class Global_Model:
         self.incre_counter %= self.capacity
         return self.state_dict
 
-    def Update_True(self, model, gpu_index):
-        model = model.to(gpu_index)
-
-        return model
 
 
         
