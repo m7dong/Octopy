@@ -1,6 +1,6 @@
 # Setup
 title:        Octopy
-tagline:      A multiprocessing Federated Learning Simulation Tool
+tagline:      A Multiprocessing Federated Learning Simulation Tool
 baseurl:      "/"
 paginate:     1
 locale:       "en"
