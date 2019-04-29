@@ -21,12 +21,13 @@ def launch_one_processing(processing_index, partial_model, device,
 class GPU_Container:
     def __init__(self, users, global_model, gpu_parallel, device):
         self.users = users
-    	self.partial_model = Partial_Model(capacity = len(self.users), global_model = global_model, device = device)
+    	  self.partial_model = Partial_Model(capacity = len(self.users), global_model = global_model, device = device)
         self.gpu_parallel = gpu_parallel
         self.device = device
         self.partial_global_queue = mp.Queue(maxsize=2)
         
         self.split_for_processing()
+        self.global_model = global_model
         
     def split_for_processings(self):
         self.user_list_for_processings = chunkIt(self.users, self.gpu_parallel)
