@@ -29,7 +29,7 @@ def launch_one_processing(processing_index, true_global, device,
 
 
 class GPU_Container:
-    def __init__(self, users, global_model, device, config, queue):
+    def __init__(self, users, device, config, queue):
         self.users = users
         self.gpu_parallel = config.num_local_models_per_gpu
         self.device = device
@@ -37,9 +37,9 @@ class GPU_Container:
         self.local_model_queue = queue
         
         self.split_for_processings()
-        self.global_model = global_model
-        #self.true_global = global_model.state_dict.to(self.device)
-        self.true_global = move_to_device(copy.deepcopy(global_model.state_dict), self.device)
+        # self.global_model = global_model
+        # self.true_global = global_model.state_dict.to(self.device)
+        # self.true_global = move_to_device(copy.deepcopy(global_model.state_dict), self.device)
         self.config = config
         self.done = None
         
@@ -54,11 +54,14 @@ class GPU_Container:
 
     def update_done(self, done):
         self.done = done
-            
+    
+    def update_true_global(self, global_model):
+        self.global_model = global_model
+        self.true_global = move_to_device(copy.deepcopy(global_model.saved_state_dict), self.device)
 
     def launch_gpu(self):
         assert self.done is not None
-        
+
         local_process_list = []
         for processing_index in range(self.gpu_parallel):
             new_p = mp.Process(target=launch_one_processing, \
