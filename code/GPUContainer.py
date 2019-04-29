@@ -1,5 +1,5 @@
 from PartialModel import Partial_Model 
-from warehouse.funcs import chunkIt
+from warehouse.funcs import *
 from Users import User
 from Lenet import Net
 import torch.multiprocessing as mp
@@ -19,7 +19,7 @@ def launch_one_processing(processing_index, true_global, device,
 def launch_process_update_partial(local_model_queue, device, capacity, global_model):
     partial_model = Partial_Model(device=device, capacity=capacity, global_model=global_model)
     while True:   # scan the queue
-        if (not self.name_queue.empty()):  
+        if (not local_model_queue.empty()):  
             local_model = local_model_queue.get(block=False)            # get a trained local model from the queue
             flag = partial_model.partial_updates_sum( w_in=local_model) # add it to partial model
             if flag == 1:                                               # if enough number of local models are added to partial model
@@ -58,14 +58,6 @@ class GPU_Container:
         pool.apply_async(launch_process_update_partial, \
                     args=(self.local_model_queue, self.device, len(self.users), self.global_model))        
 
-
-if __name__ == '__main__':
-    
-    pool = mp.Pool()
-    num_gpus = 2
-    for i in range(num_gpus):
-        gpu_container = GPU_Container(user_list, global_model, gpu_parallel=4, device=i)
-        gpu_container.launch_gpu(pool)
         
 
         

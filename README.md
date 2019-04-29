@@ -4,5 +4,4 @@
 
 
 **Octopy** is an efficient framework for parallel simulation of Federated Learning atop Pytorch.
-**Octopy** is an efficient test framework for parallel simulation test1 of Federated Learning atop Pytorch.
 
