@@ -4,29 +4,34 @@ from Users import User
 from Lenet import Net
 import torch.multiprocessing as mp
 import copy 
+import time
 
-def launch_one_processing(processing_index, partial_model, device, 
-                            user_list_for_processings, partial_global_queue):
-    ready_model = Net().load_state_dict(partial_model.true_global).to(device)
+def launch_one_processing(processing_index, true_global, device, 
+                            user_list_for_processings, local_model_queue):
+    ready_model = Net().load_state_dict(true_global).to(device)
     for user_index in user_list_for_processings[processing_index]:
-        ready_model.load_state_dict(partial_model.true_global)
+        ready_model.load_state_dict(true_global)
         current_user = User(user_index=user_index, ready_model=ready_model)
         current_user.local_train()
         #TODO: how to push local model (subprocessing N) to partial global (main processing)
-        partial_global_queue.put(copy.deepcopy(current_user.net.state_dict()), block=True)
+        local_model_queue.put(copy.deepcopy(current_user.net.state_dict()), block=True)
 
 
-def launch_process_update_global(global_model, partial_global_queue):
-    partial_model_dict = partial_global_queue.get(block=False)
-
-    for k, v in partial_model_dict.state_dict.items():
-        global_model[k] += v
-
+def launch_process_update_partial(local_model_queue, device, capacity, global_model):
+    partial_model = Partial_Model(device=device, capacity=capacity, global_model=global_model)
+    while True:   # scan the queue
+        if (not self.name_queue.empty()):  
+            local_model = local_model_queue.get(block=False)            # get a trained local model from the queue
+            flag = partial_model.partial_updates_sum( w_in=local_model) # add it to partial model
+            if flag == 1:                                               # if enough number of local models are added to partial model
+                break                                                   # this process can be shut down
+        else: 
+            time.sleep(1)                                               # if the queue is empty, keep scaning
+    return partial_model.state_dict
 
 class GPU_Container:
     def __init__(self, users, global_model, gpu_parallel, device):
         self.users = users
-    	self.partial_model = Partial_Model(capacity = len(self.users), global_model = global_model, device = device)
         self.gpu_parallel = gpu_parallel
         self.device = device
         self.partial_global_queue = mp.Queue(maxsize=2)
@@ -45,13 +50,12 @@ class GPU_Container:
             
 
     def launch_gpu(self, pool):
-        for processing_index in range(self.gpu_parallel-1):
+        for processing_index in range(self.gpu_parallel):
             pool.apply_async(launch_one_processing, \
                     args=(processing_index, self.partial_model, self.device, self.user_list_for_processing,
                             self.partial_global_queue))
 
-        processing_index = self.gpu_parallel-1
-        pool.apply_async(launch_process_update_global, \
+        pool.apply_async(launch_process_update_partial, \
                     args=(self.global_model, self.partial_global_queue))        
 
 
