@@ -24,7 +24,7 @@ class Partial_Model:
             # 1. divide
             for k in self.state_dict.keys():
                 self.state_dict[k] /= self.counter
-        return self.state_dict
+            return 1  # 
 
 
 def update_partial_sum(l, user_list_, partial_model_):
