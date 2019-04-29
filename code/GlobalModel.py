@@ -11,7 +11,7 @@ class Global_Model:
         self.round = 0              # current round of Federated Learning
         self.capacity = capacity    # how many partial global you expect to receive per round
         self.state_dict = state_dict  # weights of global model
-        self.save_state_dict = state_dict
+        self.saved_state_dict = state_dict
 
 
     def Incre_FedAvg(self, w_in):
@@ -31,9 +31,10 @@ class Global_Model:
             print('This is the end of this round ...')
             self.round += 1
             self.incre_counter = 0
+            self.saved_state_dict = self.state_dict
             print('flag: ', 1)
             return 1
-            
+
         print('flag: ', 0)
         return 0
 

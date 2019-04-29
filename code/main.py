@@ -42,8 +42,9 @@ def main():
     queue = mp.Queue(maxsize=2)
     GPU_Containers = []
     for gpu_idx, users in coordinator.items():
-        GPU_Containers.append(GPU_Container(users = users, global_model=global_model, \
-                                           device = torch.device('cuda:'+str(gpu_idx)), config=config, queue=queue))
+        GPU_Containers.append(GPU_Container(users = users, \
+                                           device = torch.device('cuda:'+str(gpu_idx)), \
+                                           config=config, queue=queue))
 
     for i in range(config.num_steps):
         done = mp.Event()
@@ -53,6 +54,7 @@ def main():
         local_process_list = []
         for gpu_launcher in GPU_Containers:
             gpu_launcher.update_done(done)
+            gpu_launcher.update_true_global(global_model)
             local_process_list += gpu_launcher.launch_gpu()
 
         
