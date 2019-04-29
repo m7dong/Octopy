@@ -50,11 +50,9 @@ class GPU_Container:
                     args=(processing_index, self.partial_model, self.device, self.user_list_for_processing,
                             self.partial_global_queue))
 
-
-    def update_partial_to_global(self, pool):
         processing_index = self.gpu_parallel-1
         pool.apply_async(launch_process_update_global, \
-                    args=(self.global_model, self.partial_global_queue))
+                    args=(self.global_model, self.partial_global_queue))        
 
 
 if __name__ == '__main__':
