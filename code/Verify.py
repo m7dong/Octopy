@@ -26,9 +26,13 @@ def get_avg_state_dict(paths):
 
 
 if __name__ == '__main__':
-	paths = []
+	paths = ['checkpoint_%d.pth' % user_index for user_index in range(10)]
 
-    main(paths)
+    get_avg_state_dict(paths)
+
+    global_path = 'checkpoint_global.pth'
+
+    load_checkpoint(global_path)
 
 
 
