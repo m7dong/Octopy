@@ -8,6 +8,8 @@ import time
 
 def launch_one_processing(processing_index, true_global, device, 
                             user_list_for_processings, local_model_queue):
+    print("launch local model training process: ", device, processing_index)
+    
     ready_model = Net().load_state_dict(true_global).to(device)
     for user_index in user_list_for_processings[processing_index]:
         ready_model.load_state_dict(true_global)
