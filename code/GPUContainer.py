@@ -13,7 +13,6 @@ def launch_one_processing(processing_index, true_global, device,
         ready_model.load_state_dict(true_global)
         current_user = User(user_index=user_index, ready_model=ready_model)
         current_user.local_train()
-        #TODO: how to push local model (subprocessing N) to partial global (main processing)
         local_model_queue.put(copy.deepcopy(current_user.net.state_dict()), block=True)
 
 
@@ -34,7 +33,7 @@ class GPU_Container:
         self.users = users
         self.gpu_parallel = gpu_parallel
         self.device = device
-        self.partial_global_queue = mp.Queue(maxsize=2)
+        self.local_model_queue = mp.Queue(maxsize=2)
         
         self.split_for_processing()
         self.global_model = global_model
@@ -53,10 +52,10 @@ class GPU_Container:
         for processing_index in range(self.gpu_parallel):
             pool.apply_async(launch_one_processing, \
                     args=(processing_index, self.partial_model, self.device, self.user_list_for_processing,
-                            self.partial_global_queue))
+                            self.local_model_queue))
 
         pool.apply_async(launch_process_update_partial, \
-                    args=(self.global_model, self.partial_global_queue))        
+                    args=(self.local_model_queue, self.device, len(self.users), self.global_model))        
 
 
 if __name__ == '__main__':
