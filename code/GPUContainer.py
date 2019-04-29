@@ -28,9 +28,6 @@ def launch_one_processing(processing_index, true_global, device,
     print("**Ending local model training process: ", device, processing_index)
 
 
-
-
-
 class GPU_Container:
     def __init__(self, users, global_model, device, config, queue):
         self.users = users
