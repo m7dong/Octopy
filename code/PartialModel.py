@@ -1,6 +1,7 @@
 import torch
 from Lenet import Net
 from multiprocessing import Process, Lock
+import copy
 #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Partial_Model:
@@ -9,7 +10,7 @@ class Partial_Model:
         capacity = num of local models
         """
         self.device = device #which gpu this Partial_Model is located
-        self.state_dict = global_model.state_dict # weights of partial model
+        self.state_dict = copy.deepcopy(global_model.state_dict) # weights of partial model
         self.capacity = capacity # how many local models specified in the same GPU
         self.global_model = global_model
         self.true_global = global_model.state_dict
