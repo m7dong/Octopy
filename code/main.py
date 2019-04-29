@@ -68,7 +68,7 @@ def main():
             p.join()
         # partial_model_process.join()
 
-    save_checkpoint(global_model, filename='checkpoint_global.pth')
+    save_checkpoint(global_model.saved_state_dict, 'checkpoint_global.pth')
 
         
 

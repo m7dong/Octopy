@@ -3,7 +3,6 @@ from torch import nn, autograd
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import random
-from sklearn import metrics
 from torch.autograd import Variable
 from torch.utils import data
 from warehouse.funcs import get_dataloader, save_checkpoint
@@ -51,7 +50,7 @@ class User(object):
 				#print('U-8: ')
 				self.optimizer.step()
 
-		save_checkpoint(self.net, filename='checkpoint_%d.pth' % user_index)		
+		save_checkpoint(self.net, filename='checkpoint_%d.pth' % self.user_index)		
 		
 
 

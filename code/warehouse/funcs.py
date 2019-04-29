@@ -1,7 +1,8 @@
 '''
     funcs.py
 '''
-
+import torch
+from collections import OrderedDict
 
 def get_dataloader():
     from torchvision import datasets, transforms
@@ -48,8 +49,8 @@ def chunkIt(seq, num):
 
 def save_checkpoint(model, filename='checkpoint.pth', optimizer=None, epoch=1):
     # model or model_state
-    out = model if type(model) is dict else model.state_dict()
-         
+    out = model if type(model) is OrderedDict else model.state_dict()
+    out = move_to_device(out, torch.device('cpu'))
     if optimizer is None:
         torch.save({
             'epoch': epoch,
