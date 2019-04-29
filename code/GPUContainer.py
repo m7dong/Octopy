@@ -19,9 +19,9 @@ def launch_one_processing(processing_index, true_global, device,
 def launch_process_update_partial(local_model_queue, device, capacity, global_model):
     partial_model = Partial_Model(device=device, capacity=capacity, global_model=global_model)
     while True:   # scan the queue
-        if (not self.name_queue.empty()):  
+        if not local_model_queue.empty():  
             local_model = local_model_queue.get(block=False)            # get a trained local model from the queue
-            flag = partial_model.partial_updates_sum( w_in=local_model) # add it to partial model
+            flag = partial_model.partial_updates_sum(w_in=local_model)  # add it to partial model
             if flag == 1:                                               # if enough number of local models are added to partial model
                 break                                                   # this process can be shut down
         else: 
@@ -55,8 +55,10 @@ class GPU_Container:
                     args=(processing_index, self.true_global, self.device, self.user_list_for_processing,
                             self.local_model_queue))
 
-        pool.apply_async(launch_process_update_partial, \
-                    args=(self.local_model_queue, self.device, len(self.users), self.global_model))        
+        partial_model_res = pool.apply_async(launch_process_update_partial, \
+                                args=(self.local_model_queue, self.device, len(self.users), self.global_model))  
+
+        return partial_model_res      
 
 
 if __name__ == '__main__':

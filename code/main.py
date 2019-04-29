@@ -36,8 +36,12 @@ def main():
     pool = mp.Pool()
     
     assert len(GPU_Containers) == config.num_gpu
+    partial_res_list = []
     for gpu_launcher in GPU_Containers:
-        gpu_launcher.launch_gpu(pool)
+        partial_res_list.append(gpu_launcher.launch_gpu(pool).get())
+
+    for p in partial_res_list:
+        global_model.Incre_FedAvg(p) 
         
     pool.close()
     pool.join()
