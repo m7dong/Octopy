@@ -10,7 +10,7 @@ class Config():
         self.parser.add_argument('--num_users', type=int,
                                  default=10, help='Total number of users')
         self.parser.add_argument('--num_steps', type=int,
-                                 default=5, help='Number of steps training federated model')
+                                 default=1, help='Number of steps training federated model')
         self.parser.add_argument('--num_epochs', type=int,
                                  default=1, help='Number of epochs training local models')
         self.parser.add_argument('--optimizer', type=str,

@@ -6,7 +6,7 @@ import random
 from sklearn import metrics
 from torch.autograd import Variable
 from torch.utils import data
-from warehouse.funcs import get_dataloader
+from warehouse.funcs import get_dataloader, save_checkpoint
 import torch.nn.functional as F
 
 
@@ -50,7 +50,8 @@ class User(object):
 				loss.backward()
 				#print('U-8: ')
 				self.optimizer.step()
-				
+
+		save_checkpoint(self.net, filename='checkpoint_%d.pth' % user_index)		
 		
 
 

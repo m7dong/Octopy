@@ -68,6 +68,8 @@ def main():
             p.join()
         # partial_model_process.join()
 
+    save_checkpoint(global_model, filename='checkpoint_global.pth')
+
         
 
 if __name__ == '__main__':
