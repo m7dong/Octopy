@@ -7,7 +7,11 @@ def get_dataloader():
         './data/MNIST/', train=False, download=True, transform=trans_mnist)
     return dataset_train, dataset_test
 
-
+def move_to_device(state_dict, target_device):
+    for key in state_dict.keys():
+        state_dict[key] = state_dict[key].to(target_device)
+    return state_dict 
+        
 def launch_training_on_different_gpu(model):
     num_users = 20
     num_of_gpus = 2
