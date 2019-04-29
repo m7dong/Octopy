@@ -6,7 +6,7 @@ import random
 from sklearn import metrics
 from torch.autograd import Variable
 from torch.utils import data
-from funcs import get_dataloader
+from warehouse.funcs import get_dataloader
 import torch.nn.functional as F
 
 
@@ -31,7 +31,7 @@ class User(object):
 
 
 	def set_optimizer(self, optimizer):
-		if self.optimizer = 'Adam':
+		if self.optimizer == 'Adam':
 			return torch.optim.Adam
 
 		return torch.optim.SGD
