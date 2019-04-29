@@ -2,9 +2,9 @@ def get_dataloader():
     from torchvision import datasets, transforms
     trans_mnist = transforms.Compose([transforms.ToTensor()])
     dataset_train = datasets.MNIST(
-        './data/MNIST/', train=True, download=True, transform=trans_mnist)
+        './data/MNIST/', train=True, download=False, transform=trans_mnist)
     dataset_test = datasets.MNIST(
-        './data/MNIST/', train=False, download=True, transform=trans_mnist)
+        './data/MNIST/', train=False, download=False, transform=trans_mnist)
     return dataset_train, dataset_test
 
 def move_to_device(state_dict, target_device):

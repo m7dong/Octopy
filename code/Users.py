@@ -13,43 +13,43 @@ import torch.nn.functional as F
 class User(object):
 	def __init__(self, user_index, ready_model, learning_rate=0.0001, 
 					loss_func=None, local_batchsize=100, local_epoch=10, optimizer='SGD'):
+		#print('U-1')
 		self.user_index = user_index
 		self.net = ready_model
-		self.device = next(self.net.parameters()).device
-		
+		self.device = torch.device(next(self.net.parameters()).device)
+		#print('U-2: ', type(self.device))
 		self.learning_rate = learning_rate
 		self.local_batchsize = local_batchsize
 		self.local_epoch = local_epoch
-		self.optimizer = self.set_optimizer(optimizer)
-		self.loss_func = self.set_loss_func(loss_func)
+		self.optimizer = torch.optim.SGD(self.net.parameters(), lr=self.learning_rate)
+		self.loss_func = F.nll_loss
+		#print('U-3')
+		self.local_train_dataset, self.local_test_dataset = get_dataloader()  # just for testing
+		self.local_train_loader = torch.utils.data.DataLoader(self.local_train_dataset, 
+															batch_size=self.local_batchsize,
+															shuffle=True)
+		self.local_test_loader = torch.utils.data.DataLoader(self.local_test_dataset, 
+															shuffle=False)
 
-		self.local_train_loader, self.local_test_loader = get_dataloader()  # just for testing
-
-
-	def set_loss_func(self, loss_func):
-		return F.nll_loss
-
-
-	def set_optimizer(self, optimizer):
-		if self.optimizer == 'Adam':
-			return torch.optim.Adam
-
-		return torch.optim.SGD
 
 	def local_train(self):
-		model = self.net
-		model.train()
-		optimizer = self.optimizer(net.parameters(), lr=self.learning_rate)
-		train_loader = self.local_train_loader
-
+		print('Starting the training of user: ', self.user_index)
+		self.net.train()
 		for epoch in range(1, self.local_epoch + 1):
-			for batch_idx, (data, target) in enumerate(train_loader):
-				data, target = data.to(device), target.to(device)
-				optimizer.zero_grad()
-				output = model(data)
+			#print('LOL, I am training...')
+			for batch_idx, (data, target) in enumerate(self.local_train_loader):
+				#print('U-3: ', target)
+				data, target = data.to(self.device), target.to(self.device)
+				#print('U-4: ', data)
+				self.optimizer.zero_grad()
+				#print('U-5: ', type(self.net))
+				output = self.net(data)
+				#print('U-6: ')
 				loss = self.loss_func(output, target)
+				#print('U-7: ')
 				loss.backward()
-				optimizer.step()
+				#print('U-8: ')
+				self.optimizer.step()
 				
 		
 

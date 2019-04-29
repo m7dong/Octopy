@@ -11,17 +11,31 @@ class Global_Model:
         self.round = 0              # current round of Federated Learning
         self.capacity = capacity    # how many partial global you expect to receive per round
         self.state_dict = state_dict  # weights of global model
+        self.save_state_dict = state_dict
 
 
     def Incre_FedAvg(self, w_in):
+        print('counter: ', self.incre_counter)
+        if self.incre_counter == 0:
+            self.state_dict = w_in
+            self.incre_counter += 1
+            print('flag: ', 0)
+            return 0
+
         for k in self.state_dict.keys():  # iterate every weight element
             self.state_dict[k] += torch.div(w_in[k].cpu(), self.incre_counter)
             self.state_dict[k] = torch.div(self.state_dict[k], 1/self.incre_counter+1)
 
         self.incre_counter += 1
-        self.round += (self.incre_counter / self.capacity)
-        self.incre_counter %= self.capacity
-        return self.state_dict
+        if self.incre_counter == self.capacity:
+            print('This is the end of this round ...')
+            self.round += 1
+            self.incre_counter = 0
+            print('flag: ', 1)
+            return 1
+            
+        print('flag: ', 0)
+        return 0
 
 
 
