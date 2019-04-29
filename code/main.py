@@ -30,7 +30,7 @@ def main():
     GPU_Containers = []
     for gpu_idx, users in coordinator.items():
         GPU_Containers.append(GPUContainer(users = users, global_model=global_model, \
-                                           gpu_parallel = config.num_local_models_per_gpu+1, 
+                                           gpu_parallel = config.num_local_models_per_gpu, 
                                            device = torch.device('cuda:'+str(gpu_idx))))
     
     pool = mp.Pool()
