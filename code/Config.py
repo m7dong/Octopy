@@ -4,15 +4,15 @@ class Config():
     def __init__(self):
         self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         self.parser.add_argument('--num_gpu', type=int,
-                                 default=8, help='Number of GPUs')
+                                 default=2, help='Number of GPUs')
         self.parser.add_argument('--num_local_models_per_gpu', type=int,
-                                 default=8, help='Number of local models per GPU')
+                                 default=5, help='Number of local models per GPU')
         self.parser.add_argument('--num_users', type=int,
-                                 default=100, help='Total number of users')
+                                 default=10, help='Total number of users')
         self.parser.add_argument('--num_steps', type=int,
-                                 default=10, help='Number of steps training federated model')
+                                 default=1, help='Number of steps training federated model')
         self.parser.add_argument('--num_epochs', type=int,
-                                 default=100, help='Number of epochs training local models')
+                                 default=1, help='Number of epochs training local models')
         self.parser.add_argument('--optimizer', type=str,
                                  default='SGD', help='optimizer type: one of SGD | Adam ')
         self.parser.add_argument('--lr', type=int,
