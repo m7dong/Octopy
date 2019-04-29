@@ -32,6 +32,7 @@ class GPU_Container:
         self.partial_global_queue = mp.Queue(maxsize=2)
         
         self.split_for_processing()
+        self.global_model = global_model
         
 
     def split_for_processings(self):
