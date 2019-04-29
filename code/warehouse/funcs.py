@@ -3,6 +3,7 @@
 '''
 import torch
 from collections import OrderedDict
+import time
 
 def get_dataloader():
     from torchvision import datasets, transforms
@@ -12,6 +13,31 @@ def get_dataloader():
     dataset_test = datasets.MNIST(
         './data/MNIST/', train=False, download=False, transform=trans_mnist)
     return dataset_train, dataset_test
+
+
+
+
+def launch_process_update_partial(local_model_queue, global_model, done):
+    while True:   # scan the queue
+        if not local_model_queue.empty():  
+            local_model = local_model_queue.get(block=False)            # get a trained local model from the queue
+            flag = global_model.Incre_FedAvg(w_in=local_model)  # add it to partial model
+            if flag == 1:
+                done.set()                                               # if enough number of local models are added to partial model
+                break                                                   # this process can be shut down
+        else: 
+            time.sleep(1)                                               # if the queue is empty, keep scaning
+
+def gpu_update_users(user_list, gpu_list):
+    coordinator = clients_coordinator(clients_list = user_list, 
+                    num_of_gpus = len(gpu_list))
+    for gpu_idx, users in coordinator.items():
+        gpu_list[gpu_idx].update_users(users)  
+
+    return gpu_list
+
+
+
 
 
 def move_to_device(state_dict, target_device):

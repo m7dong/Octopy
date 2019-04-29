@@ -50,7 +50,7 @@ class User(object):
 				#print('U-8: ')
 				self.optimizer.step()
 
-		save_checkpoint(self.net, filename='checkpoint_%d.pth' % self.user_index)		
+		# save_checkpoint(self.net, filename='checkpoint_%d.pth' % self.user_index)		
 		
 
 

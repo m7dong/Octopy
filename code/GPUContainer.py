@@ -29,17 +29,11 @@ def launch_one_processing(processing_index, true_global, device,
 
 
 class GPU_Container:
-    def __init__(self, users, device, config, queue):
-        self.users = users
+    def __init__(self, device, config, queue):
+        self.users = None
         self.gpu_parallel = config.num_local_models_per_gpu
         self.device = device
-        #m = mp.Manager()
         self.local_model_queue = queue
-        
-        self.split_for_processings()
-        # self.global_model = global_model
-        # self.true_global = global_model.state_dict.to(self.device)
-        # self.true_global = move_to_device(copy.deepcopy(global_model.state_dict), self.device)
         self.config = config
         self.done = None
         
