@@ -1,5 +1,5 @@
 from PartialModel import Partial_Model 
-from funcs import chunkIt
+from warehouse.funcs import chunkIt
 from Users import User
 from Lenet import Net
 import torch.multiprocessing as mp
@@ -58,6 +58,7 @@ class GPU_Container:
 if __name__ == '__main__':
     
     pool = mp.Pool()
+    num_gpus = 2
     for i in range(num_gpus):
         gpu_container = GPU_Container(user_list, global_model, gpu_parallel=4, device=i)
         gpu_container.launch_gpu(pool)
