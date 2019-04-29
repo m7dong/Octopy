@@ -12,21 +12,19 @@ class Partial_Model:
         self.device = device #which gpu this Partial_Model is located
         self.state_dict = copy.deepcopy(global_model.state_dict) # weights of partial model
         self.capacity = capacity # how many local models specified in the same GPU
-        self.global_model = global_model
-        self.true_global = global_model.state_dict
         self.state_dict.to(self.device)  # TODO: it will return an error.
+        self.counter = 0
         
     def partial_updates_sum(self, w_in):
-        #w_in represents weights from a local model
+        # w_in represents weights from a local model
         for k in self.state_dict.keys(): # iterate every weight element
             self.state_dict[k] += w_in[k]
-        
+        self.counter += 1
+        if self.counter == self.capacity:
+            # 1. divide
+            for k in self.state_dict.keys():
+                self.state_dict[k] /= self.counter
         return self.state_dict
-
-    
-    def pull_global(self):
-        assert self.global_model.incre_counter == 0   # make sure that global is the true global
-        self.true_global = self.global_model.state_dict
 
 
 def update_partial_sum(l, user_list_, partial_model_):
