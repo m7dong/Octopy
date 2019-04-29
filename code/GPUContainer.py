@@ -37,6 +37,7 @@ class GPU_Container:
         
         self.split_for_processing()
         self.global_model = global_model
+        self.true_global = global_model.state_dict.to(self.device)
         
 
     def split_for_processings(self):
@@ -51,7 +52,7 @@ class GPU_Container:
     def launch_gpu(self, pool):
         for processing_index in range(self.gpu_parallel):
             pool.apply_async(launch_one_processing, \
-                    args=(processing_index, self.partial_model, self.device, self.user_list_for_processing,
+                    args=(processing_index, self.true_global, self.device, self.user_list_for_processing,
                             self.local_model_queue))
 
         pool.apply_async(launch_process_update_partial, \
