@@ -2,17 +2,17 @@ import torch
 import torch.multiprocessing as mp
 
 from GlobalModel import Global_Model
-from PartialModel import Partial_Model
+# from PartialModel import Partial_Model
 from warehouse.funcs import *
 from GPUContainer import GPU_Container
 from Config import Config
-from Lenet import Net
+import models
 import time
 
 
-def initialize_global_model(num_gpus, num_local, config):
+def initialize_global_model(config):
     # initialize global model on CPU
-    global_net = Net()
+    global_net = models.__dict__[config.model]()
     global_model = Global_Model(state_dict = global_net.state_dict(), capacity = config.num_users)
     return global_model
 
@@ -22,7 +22,7 @@ def main():
     mp.set_start_method('spawn', force=True)
 
     # initialize global model
-    global_model = initialize_global_model(config.num_gpu, config.num_local_models_per_gpu, config)
+    global_model = initialize_global_model(config)
  
     # setup queue for trained local models
     queue = mp.Queue(maxsize=2)

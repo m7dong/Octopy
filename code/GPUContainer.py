@@ -1,7 +1,7 @@
-from PartialModel import Partial_Model 
+# from PartialModel import Partial_Model 
 from warehouse.funcs import *
 from Users import User
-from Lenet import Net
+import models
 import torch.multiprocessing as mp
 import copy 
 import time
@@ -11,7 +11,7 @@ def launch_one_processing(processing_index, true_global, device,
                             user_list_for_processings, local_model_queue, config, done):
     print("launch local model training process: ", device, processing_index)
     #print('true global', true_global)
-    ready_model = Net()
+    ready_model = models.__dict__[config.model]()
     ready_model.to(device).load_state_dict(true_global)
     #print('1')
     for user_index in user_list_for_processings[processing_index]:
