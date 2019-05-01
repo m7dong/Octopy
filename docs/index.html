@@ -10,4 +10,21 @@ title: {{ site.name }}
       <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
   </ul>
+  <h1>Introduction</h1>
+    <ul class="posts">
+      {% for post in site.posts %}
+        <li><span>Problem Statement</li>
+      {% endfor %}
+    </ul>
+    <ul class="posts">
+      {% for post in site.posts %}
+        <li><span>Why Multiprocessing</li>
+      {% endfor %}
+    </ul><ul class="posts">
+      {% for post in site.posts %}
+        <li><span>Challenges</li>
+      {% endfor %}
+    </ul>
+  <h1>Design</h1>
+  <h1>Performance</h1>
 </div>
