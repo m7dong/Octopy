@@ -10,18 +10,13 @@ import torch.nn.functional as F
 
 
 class User(object):
-	def __init__(self, user_index, ready_model, learning_rate=0.0001, 
-					loss_func=None, local_batchsize=100, local_epoch=10, optimizer='SGD'):
+	def __init__(self, user_index, ready_model, config):
 		#print('U-1')
+		self.update_local_config(config.users[user_index])
 		self.user_index = user_index
 		self.net = ready_model
 		self.device = torch.device(next(self.net.parameters()).device)
 		#print('U-2: ', type(self.device))
-		self.learning_rate = learning_rate
-		self.local_batchsize = local_batchsize
-		self.local_epoch = local_epoch
-		self.optimizer = torch.optim.SGD(self.net.parameters(), lr=self.learning_rate)
-		self.loss_func = F.nll_loss
 		#print('U-3')
 		self.local_train_dataset, self.local_test_dataset = get_dataloader()  # just for testing
 		self.local_train_loader = torch.utils.data.DataLoader(self.local_train_dataset, 
@@ -30,9 +25,22 @@ class User(object):
 		self.local_test_loader = torch.utils.data.DataLoader(self.local_test_dataset, 
 															shuffle=False)
 
+	def update_local_config(self, local_config):
+		self.__dict__.update(local_config)
+
+	def get_optimizer(self):
+		if self.optimizer == 'SGD':
+			return torch.optim.SGD(self.net.parameters(), lr=self.lr)
+		return torch.optim.SGD(self.net.parameters(), lr=self.lr)
+
+	def get_loss_func(self):
+		if self.loss_func == 'nll':
+			return F.nll_loss
 
 	def local_train(self):
 		print('Starting the training of user: ', self.user_index)
+		optimizer = self.get_optimizer()
+		loss_func = self.get_loss_func()
 		self.net.train()
 		for epoch in range(1, self.local_epoch + 1):
 			#print('LOL, I am training...')
@@ -40,15 +48,15 @@ class User(object):
 				#print('U-3: ', target)
 				data, target = data.to(self.device), target.to(self.device)
 				#print('U-4: ', data)
-				self.optimizer.zero_grad()
+				optimizer.zero_grad()
 				#print('U-5: ', type(self.net))
 				output = self.net(data)
 				#print('U-6: ')
-				loss = self.loss_func(output, target)
+				loss = loss_func(output, target)
 				#print('U-7: ')
 				loss.backward()
 				#print('U-8: ')
-				self.optimizer.step()
+				optimizer.step()
 
 		# save_checkpoint(self.net, filename='checkpoint_%d.pth' % self.user_index)		
 		
