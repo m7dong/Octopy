@@ -15,8 +15,6 @@ def get_dataloader():
     return dataset_train, dataset_test
 
 
-
-
 def launch_process_update_partial(local_model_queue, global_model, done):
     while True:   # scan the queue
         if not local_model_queue.empty():  
@@ -28,6 +26,7 @@ def launch_process_update_partial(local_model_queue, global_model, done):
         else: 
             time.sleep(1)                                               # if the queue is empty, keep scaning
 
+
 def gpu_update_users(user_list, gpu_list):
     coordinator = clients_coordinator(clients_list = user_list, 
                     num_of_gpus = len(gpu_list))
@@ -35,9 +34,6 @@ def gpu_update_users(user_list, gpu_list):
         gpu_list[gpu_idx].update_users(users)  
 
     return gpu_list
-
-
-
 
 
 def move_to_device(state_dict, target_device):

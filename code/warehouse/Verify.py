@@ -1,7 +1,5 @@
 import torch
 
-
-
 def load_checkpoint(snapshot_path, num_gpu=1):
     if isinstance(snapshot_path, str):
         cp = torch.load(snapshot_path)

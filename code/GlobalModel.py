@@ -1,4 +1,3 @@
-
 import torch
 
 class Global_Model:

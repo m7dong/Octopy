@@ -1,5 +1,6 @@
 import argparse
 import models
+
 class Config():
     def __init__(self):
         model_names = sorted(name for name in models.__dict__
