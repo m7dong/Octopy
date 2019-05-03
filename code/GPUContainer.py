@@ -8,7 +8,7 @@ import time
 import torch
 
 def launch_one_processing(processing_index, true_global, device, 
-                            user_list_for_processings, local_model_queue, config, done):
+                            user_list_for_processings, local_model_queue, config, done, step_dict, step):
     print("launch local model training process: ", device, processing_index)
     #print('true global', true_global)
     ready_model = Net()
@@ -20,7 +20,7 @@ def launch_one_processing(processing_index, true_global, device,
         #print('3')
         current_user = User(user_index=user_index, ready_model=ready_model, local_epoch=config.num_epochs)
         #print('4')
-        current_user.local_train()
+        current_user.local_train(step_dict[user_index][step])
         #print('5')
         local_model_queue.put(move_to_device(copy.deepcopy(current_user.net.state_dict()), torch.device('cpu')), block=True)
     print("Ending local model training process: ", device, processing_index)
@@ -29,7 +29,7 @@ def launch_one_processing(processing_index, true_global, device,
 
 
 class GPU_Container:
-    def __init__(self, users, device, config, queue):
+    def __init__(self, users, device, config, queue, step_dict):
         self.users = users
         self.gpu_parallel = config.num_local_models_per_gpu
         self.device = device
@@ -42,6 +42,7 @@ class GPU_Container:
         # self.true_global = move_to_device(copy.deepcopy(global_model.state_dict), self.device)
         self.config = config
         self.done = None
+        self.step_dict = step_dict
         
 
     def split_for_processings(self):
@@ -59,14 +60,14 @@ class GPU_Container:
         self.global_model = global_model
         self.true_global = move_to_device(copy.deepcopy(global_model.saved_state_dict), self.device)
 
-    def launch_gpu(self):
+    def launch_gpu(self, step):
         assert self.done is not None
 
         local_process_list = []
         for processing_index in range(self.gpu_parallel):
             new_p = mp.Process(target=launch_one_processing, \
                     args=(processing_index, self.true_global, self.device, self.user_list_for_processings,\
-                            self.local_model_queue, self.config, self.done))
+                            self.local_model_queue, self.config, self.done, self.step_dict, step))
             new_p.start()
             local_process_list.append(new_p)
 

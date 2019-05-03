@@ -41,11 +41,28 @@ def main():
     
     queue = mp.Queue(maxsize=2)
     GPU_Containers = []
+    gpu_step_dicts = {}
+    
+    default_user = {
+        'learning rate' = 0.1 
+    }
+
     for gpu_idx, users in coordinator.items():
+        step_dict = {}
+        for user in users:
+            step_dict[user] = {
+                '1': default_user,
+                '2': {
+                    'learning rate': 0.01
+                }
+            }
+        }
+        gpu_step_dics[gpu_idx] = step_dict
+        
         GPU_Containers.append(GPU_Container(users = users, \
                                            device = torch.device('cuda:'+str(gpu_idx)), \
-                                           config=config, queue=queue))
-
+                                           config=config, queue=queue, step_dict=step_dict))
+ 
     for i in range(config.num_steps):
         done = mp.Event()
         print("Federated Step: ", i)
@@ -55,7 +72,7 @@ def main():
         for gpu_launcher in GPU_Containers:
             gpu_launcher.update_done(done)
             gpu_launcher.update_true_global(global_model)
-            local_process_list += gpu_launcher.launch_gpu()
+            local_process_list += gpu_launcher.launch_gpu(i)
 
         
         # partial_model_process = mp.Process(launch_process_update_partial, \

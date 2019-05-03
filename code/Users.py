@@ -31,7 +31,7 @@ class User(object):
 															shuffle=False)
 
 
-	def local_train(self):
+	def local_train(self, step_dict):
 		print('Starting the training of user: ', self.user_index)
 		self.net.train()
 		for epoch in range(1, self.local_epoch + 1):
