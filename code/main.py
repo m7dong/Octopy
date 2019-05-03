@@ -2,7 +2,7 @@ import torch
 import torch.multiprocessing as mp
 
 from GlobalModel import Global_Model
-# from PartialModel import Partial_Model
+from PartialModel import Partial_Model
 from warehouse.funcs import *
 from GPUContainer import GPU_Container
 from Config import Config
@@ -51,22 +51,24 @@ def main():
         gpu_launcher.update_true_global(global_model)   #update global model for each round
         local_process_list += gpu_launcher.launch_gpu()
 
-    i = 0
+    i = 1
     while True:    
-        if int(flags.sum().data.tolist()) == (config.num_local_models_per_gpu+1) * (i+1):
+        if int(flags.sum().data.tolist()) == (config.num_local_models_per_gpu+1) * config.num_gpu * i:
             #print("gathering result iter ", i)
+            print(flags)
             launch_process_update_partial(queue, global_model, done)
             for gpu_launcher in GPU_Containers:
                 gpu_launcher.update_true_global(global_model)
             i += 1
+            print("reset signal to true")
             done.set()  
             if i > config.num_steps:
+                print("cleaning all processes")
+                for p in local_process_list:
+                    p.join()
                 break
 
-    for p in local_process_list:
-        p.join()
-
-    # save_checkpoint(global_model.saved_state_dict, 'checkpoint_global.pth')
+    save_checkpoint(global_model.saved_state_dict, 'checkpoint_global.pth')
 
         
 

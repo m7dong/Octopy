@@ -1,5 +1,16 @@
 import torch
 
+import torch._utils
+try:
+    torch._utils._rebuild_tensor_v2
+except AttributeError:
+    def _rebuild_tensor_v2(storage, storage_offset, size, stride, requires_grad, backward_hooks):
+        tensor = torch._utils._rebuild_tensor(storage, storage_offset, size, stride)
+        tensor.requires_grad = requires_grad
+        tensor._backward_hooks = backward_hooks
+        return tensor
+    torch._utils._rebuild_tensor_v2 = _rebuild_tensor_v2
+
 def load_checkpoint(snapshot_path, num_gpu=1):
     if isinstance(snapshot_path, str):
         cp = torch.load(snapshot_path)
@@ -26,9 +37,10 @@ def get_avg_state_dict(paths):
 
 
 if __name__ == '__main__':
-	paths = ['checkpoint_%d.pth' % user_index for user_index in range(10)]
+	num_users = 8
+	paths = ['../checkpoint_%d.pth' % user_index for user_index in range(num_users)]
 	true = get_avg_state_dict(paths)
-	global_path = 'checkpoint_global.pth'
+	global_path = '../checkpoint_global.pth'
 	out = load_checkpoint(global_path)['state_dict']
 	for k, i in true.items():
 		# if (true[k] == out[k]):

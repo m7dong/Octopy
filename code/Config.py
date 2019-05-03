@@ -13,9 +13,9 @@ class Config():
         self.parser.add_argument('--num_local_models_per_gpu', type=int,
                                  default=3, help='Number of local models per GPU')
         self.parser.add_argument('--num_users', type=int,
-                                 default=600, help='Total number of users')
+                                 default=8, help='Total number of users')
         self.parser.add_argument('--num_steps', type=int,
-                                 default=1000, help='Number of steps training federated model')
+                                 default=2, help='Number of steps training federated model')
         self.parser.add_argument('--num_epochs', type=int,
                                  default=5, help='Number of epochs training local models')
         self.parser.add_argument('--optimizer', type=str,

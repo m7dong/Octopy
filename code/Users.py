@@ -31,7 +31,7 @@ class User(object):
 															shuffle=False)
 
 
-	def local_train(self):
+	def local_train(self, step, num_steps):
 		print('Starting the training of user: ', self.user_index)
 		self.net.train()
 		for epoch in range(1, self.local_epoch + 1):
@@ -48,9 +48,9 @@ class User(object):
 				#print('U-7: ')
 				loss.backward()
 				#print('U-8: ')
-				self.optimizer.step()
-
-		# save_checkpoint(self.net, filename='checkpoint_%d.pth' % self.user_index)		
+				self.optimizer.step()   
+		if step == num_steps:
+		    save_checkpoint(self.net, filename='checkpoint_%d.pth' % self.user_index)		
 		
 
 

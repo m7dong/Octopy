@@ -21,7 +21,7 @@ def launch_process_update_partial(local_model_queue, global_model, done):
             local_model = local_model_queue.get(block=False)            # get a trained local model from the queue
             flag = global_model.Incre_FedAvg(w_in=local_model)  # add it to partial model
             if flag == 1:
-                done.set()                                               # if enough number of local models are added to partial model
+                #done.set()                                               # if enough number of local models are added to partial model
                 break                                                   # this process can be shut down
         else: 
             time.sleep(1)                                               # if the queue is empty, keep scaning
