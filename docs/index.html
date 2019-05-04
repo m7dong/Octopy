@@ -38,7 +38,7 @@ title: {{ site.name }}
       {% endfor %}
     </ul>
 
-  <h1>Our Model</h1>
+  <h1>Implementation</h1>
     <ul class="posts">
         {% for post in site.posts %}
           <li><span>Model Design</li>
@@ -60,21 +60,29 @@ title: {{ site.name }}
               <figcaption>Fig2. An illustration of our model </figcaption>
             </figure>
 
-          <li><span>Parallel Application and Programming Model used</li>
+          <li><span>Parallel Implementation and Programming Model used</li>
             <p>
 
               <ul>
               <li>Type of application: Compute Intensive </li>
               <li>Levels of parallelism: Many-core / multi-node, Task Level + Procedure Level, Medium-grained</li>
               <li>Parallel Execution Model: Distributed-Memory Programming</li>
-              <li>Infrastructure: We use Odyssey for codes development and use a workstation with 8 GPUs (we already had access to this workstation) for testing</li>
-              <li>Programming model: Pytorch (with Multiprocessing module) (</li>
+              <li>Infrastructure: Odyssey for codes development; a workstation with 8 GPUs for testing</li>
+              <li>Programming model: Pytorch (with Multiprocessing module)</li>
+              <li>Programming language: Python</li>
             </ul> 
             </p>
         {% endfor %}
     </ul>
 
-
+  <h1>Reproducibility</h1>
 
   <h1>Performance</h1>
+
+  <h1>Discussion</h1>
+
+    <p><b>References</b>
+      
+    </p>
+
 </div>
