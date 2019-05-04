@@ -5,9 +5,7 @@ title: {{ site.name }}
 
 <div id="home">
   <h1>Introduction</h1>
-    <ul class="posts">
-      {% for post in site.posts %}
-        <li><span>Federated Learning</li>
+  <h2>Federated Learning</h2>
           <p>
             Modern mobile devices have access to a wealth of data suitable for learning models, which in turn can greatly improve the user experience on the device. For example, language models can improve speech recognition and text entry, and image models can automatically select good photos. However, this rich data is often privacy sensitive, large in quantity, or both, which may preclude logging to the data center and training there using conventional approaches.
             Federated Learning is a decentralized model training approach by leaving the training data distributed on the mobile devices, while learning a shared model by aggregating locally-computed updates.    
@@ -31,17 +29,13 @@ title: {{ site.name }}
             </ul> 
           </p>
    
-        <li><span>Problem</li>
+  <h2>Problem</h2>
           <p>
             We notice there is an urgent need of communication-efficient learning framework for deep networks using decentralized data, for example, modern mobile devices (https://arxiv.org/abs/1602.05629). However, in order to learn such model from billions of clients (potentially), an efficient simulation paradigm (through parallel programming) is necessary. Researchers need a testbed to validate performance. It is not feasible to buy 1e4 devices like Google to build such a testing environment, so researchers often use workstation with several GPUs to simulate behaviors of tens of thousands of clients. In practice, numerous local models are trained on several GPUs, and local weights are copied and updated to global model on CPU in every round of training. Since data are distributed in each client, the communication costs dominate in the federated model. And big compute is needed for weights aggregation. The current implementation is serial code, which will read weights from clients one by one, this implementation is very inefficient, the utilization of GPU is lower than 10%. Therefore, we propose a parallel implementation for this model. 
           </p>
-      {% endfor %}
-    </ul>
-
+     
   <h1>Implementation</h1>
-    <ul class="posts">
-        {% for post in site.posts %}
-          <li><span>Model Design</li>
+    <h2>Model Design</h2>
             <p>
               In our simulation paradigm, we allow users to implement their own algorithm/models (in python). Our framework will automatically utilize accessible GPU resources to greatly accelerate the lengthy training process. Since the default GPU utilization ratio is less than 10%, which is far away from its potential, we believe our model will utmostly increase its rate and ease the process of model training. The technical details of the framework are shown in the next section. In order to compare the performance of our model and the baseline (pytorch default settings, without tuning any parameters), we use MNIST and CIFAR10 as our training dataset. We implement the classical feedforward neural network and use stochastic gradient descent for learning. 
             </p>
@@ -59,8 +53,7 @@ title: {{ site.name }}
               <img src="/figures/model_design.png" alt="Model Design" style="width:auto;">
               <figcaption>Fig2. An illustration of our model </figcaption>
             </figure>
-
-          <li><span>Parallel Implementation and Programming Model used</li>
+  <h2>Parallel Implementation and Programming Model used</h2>
             <p>
 
               <ul>
@@ -72,8 +65,7 @@ title: {{ site.name }}
               <li>Programming language: Python</li>
             </ul> 
             </p>
-        {% endfor %}
-    </ul>
+       
 
   <h1>Reproducibility</h1>
 
