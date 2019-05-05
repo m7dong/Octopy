@@ -3,7 +3,7 @@ layout: default
 title: {{ site.name }}
 ---
 
-<div id="home">
+<div id="introduction">
   <h1>Introduction</h1>
   <h2>Federated Learning</h2>
           <p>
@@ -33,6 +33,7 @@ title: {{ site.name }}
           <p>
             We notice there is an urgent need of communication-efficient learning framework for deep networks using decentralized data, for example, modern mobile devices (https://arxiv.org/abs/1602.05629). However, in order to learn such model from billions of clients (potentially), an efficient simulation paradigm (through parallel programming) is necessary. Researchers need a testbed to validate performance. It is not feasible to buy 1e4 devices like Google to build such a testing environment, so researchers often use workstation with several GPUs to simulate behaviors of tens of thousands of clients. In practice, numerous local models are trained on several GPUs, and local weights are copied and updated to global model on CPU in every round of training. Since data are distributed in each client, the communication costs dominate in the federated model. And big compute is needed for weights aggregation. The current implementation is serial code, which will read weights from clients one by one, this implementation is very inefficient, the utilization of GPU is lower than 10%. Therefore, we propose a parallel implementation for this model. 
           </p>
+</div>
      
   <h1>Implementation</h1>
     <h2>Model Design</h2>
@@ -40,7 +41,7 @@ title: {{ site.name }}
               In our simulation paradigm, we allow users to implement their own algorithm/models (in python). Our framework will automatically utilize accessible GPU resources to greatly accelerate the lengthy training process. Since the default GPU utilization ratio is less than 10%, which is far away from its potential, we believe our model will utmostly increase its rate and ease the process of model training. The technical details of the framework are shown in the next section. In order to compare the performance of our model and the baseline (pytorch default settings, without tuning any parameters), we use MNIST and CIFAR10 as our training dataset. We implement the classical feedforward neural network and use stochastic gradient descent for learning. 
             </p>
             <figure>
-              <img src="/figures/fed_learn.png" alt="Federated Learning" style="width:auto;">
+              <img src="./figures/fed_learn.png" alt="Federated Learning" style="width:auto;">
               <figcaption>Fig 1. An illustration of Federated Learning</figcaption>
             </figure>
               
@@ -50,7 +51,7 @@ title: {{ site.name }}
 
             </p>
             <figure>
-              <img src="/figures/model_design.png" alt="Model Design" style="width:auto;">
+              <img src="./figures/model_design.png" alt="Model Design" style="width:auto;">
               <figcaption>Fig2. An illustration of our model </figcaption>
             </figure>
   <h2>Parallel Implementation and Programming Model used</h2>
