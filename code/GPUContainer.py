@@ -43,7 +43,7 @@ class GPU_Container:
 
 
     def step_training(self, processing_index, step):
-        print("launch local model training process: ", device, processing_index)
+        print("launch local model training process: ", self.device, processing_index)
         
         ready_model = models.__dict__[self.config.model]()
         ready_model.to(self.device).load_state_dict(self.true_global)
@@ -61,12 +61,12 @@ class GPU_Container:
         processing_index_global = (self.config.num_local_models_per_gpu + 1) * gpu_index + processing_index
         
         while True:
-            if self.flags[processing_index_global] < config.num_steps:
+            if self.flags[processing_index_global] < self.config.num_steps:
                 print(gpu_index, processing_index, self.flags[processing_index_global])
                 step = int(self.flags[processing_index_global].data.tolist()) + 1 
                 self.step_training(processing_index, step)
                 self.flags[processing_index_global] += 1
-                done.wait()
+                self.done.wait()
             else:
                 break
     
