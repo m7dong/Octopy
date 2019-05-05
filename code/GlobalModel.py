@@ -15,20 +15,13 @@ class Global_Model:
 
 
     def Incre_FedAvg(self, w_in):
-        print('global_weights received', w_in['fc2.bias'])
-        #print('counter: ', self.incre_counter)
         if self.incre_counter == 0:
-            #self.state_dict = w_in
             for k in self.state_dict.keys():
                 self.state_dict[k] = torch.div(w_in[k], self.num_users)
             self.incre_counter += 1
-            print('flag: ', 0)
-            print(self.state_dict['fc2.bias'])
             return 0
 
         for k in self.state_dict.keys():  # iterate every weight element
-            #self.state_dict[k] += torch.div(w_in[k].cpu(), self.incre_counter)
-            #self.state_dict[k] = torch.div(self.state_dict[k], 1/self.incre_counter+1)
             self.state_dict[k] += torch.div(w_in[k], self.num_users)
 
         self.incre_counter += 1
@@ -37,11 +30,8 @@ class Global_Model:
             self.round += 1
             self.incre_counter = 0
             self.saved_state_dict = self.state_dict
-            print('flag: ', 1)
-            print(self.state_dict['fc2.bias'])
             return 1
 
-        print('flag: ', 0)
         return 0
 
 
