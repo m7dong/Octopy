@@ -13,6 +13,8 @@ class Partial_Model:
         self.device = device #which gpu this Partial_Model is located
         #self.state_dict = move_to_device(copy.deepcopy(global_model), device) # weights of partial model
         self.state_dict = move_to_device(models.__dict__[config.model]().state_dict(), device)
+        for k in self.state_dict.keys(): # iterate every weight element
+            self.state_dict[k] = 0
         self.capacity = capacity # how many local models specified in the same GPU
         self.counter = 0
         
@@ -23,8 +25,8 @@ class Partial_Model:
         self.counter += 1
         if self.counter == self.capacity:
             # 1. divide
-            for k in self.state_dict.keys():
-                self.state_dict[k] /= self.counter
+            #for k in self.state_dict.keys():
+                #self.state_dict[k] /= self.counter
             return 1  # return a flag
 
         return 0

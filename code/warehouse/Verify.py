@@ -24,13 +24,18 @@ def load_checkpoint(snapshot_path, num_gpu=1):
 def get_avg_state_dict(paths):
 	avg_state_dict = None
 	for idx, path in enumerate(paths):
+		print(path)
 		model_state_dict = load_checkpoint(path)['state_dict']
 		if idx == 0:
 			avg_state_dict = model_state_dict 
 			for k,v in avg_state_dict.items():
+				if k == 'fc2.bias':
+					print(model_state_dict[k])
 				avg_state_dict[k] = model_state_dict[k] / len(paths)
 		else: 
 			for k,v in avg_state_dict.items():
+				if k == 'fc2.bias':
+					print(model_state_dict[k])
 				avg_state_dict[k] += model_state_dict[k] / len(paths)
 
 	return avg_state_dict
@@ -46,8 +51,9 @@ if __name__ == '__main__':
 		# if (true[k] == out[k]):
 		# 	print(1)
 		# else:
-		print('true: ', true[k])
-		print('out: ', out[k])
+		if k == 'fc2.bias':
+			print('true: ', true[k])
+			print('out: ', out[k])
 
 
 

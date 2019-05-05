@@ -10,7 +10,6 @@ import torch
 def step_training(processing_index, true_global, device, 
                             user_list_for_processings, local_model_queue, config, done, step):
     print("launch local model training process: ", device, processing_index)
-    #print('true global', true_global)
     ready_model = models.__dict__[config.model]()
     ready_model.to(device).load_state_dict(true_global)
     for user_index in user_list_for_processings[processing_index]:
@@ -18,7 +17,13 @@ def step_training(processing_index, true_global, device,
         current_user = User(user_index=user_index, ready_model=ready_model, local_epoch=config.num_epochs)
         current_user.local_train(step, config.num_steps)
         #print("Ending local model training for user: ", device, processing_index, user_index)
-        local_model_queue.put(copy.deepcopy(current_user.net.state_dict()), block=True)
+        #print('put: ', current_user.net.state_dict()['fc2.bias'])
+        user_model_copy = copy.deepcopy(current_user.net.state_dict())
+        local_model_queue.put(user_model_copy, block=True)
+        #local_model_queue.put(copy.deepcopy(current_user.net.state_dict()), block=True)
+        #time.sleep(3)
+        #print(current_user.net.state_dict()['fc2.bias'])
+        #time.sleep(3)
         #print("result in local queue for user: ", device, processing_index, user_index)
     print("Ending local model training process: ", device, processing_index)
     print("**Ending local model training process: ", device, processing_index)
@@ -26,7 +31,7 @@ def step_training(processing_index, true_global, device,
 
 def launch_one_training_process(gpu_index, processing_index, true_global, device, 
                             user_list_for_processings, local_model_queue, config, done, flags):
-    processing_index_global = (config.num_local_models_per_gpu + 1) * gpu_index + processing_index
+    processing_index_global = (config.num_local_models_per_gpu) * gpu_index + processing_index
     while True:
         if flags[processing_index_global] < config.num_steps:
             print(gpu_index, processing_index, flags[processing_index_global])
@@ -35,37 +40,13 @@ def launch_one_training_process(gpu_index, processing_index, true_global, device
                             user_list_for_processings, local_model_queue, config, done, step)
             flags[processing_index_global] += 1
             #print('wait', gpu_index, processing_index)
-            #print(flags[processing_index_global])
+            print(flags[processing_index_global])
             done.wait()
             #print('resume', gpu_index, processing_index)
         else:
             break
-    #print("close training process", gpu_index, processing_index)
+    print("close training process", gpu_index, processing_index)
     
-
-def launch_partial_update_process(gpu_index, processing_index, global_queue, local_model_queue, partial_model, config, done, flags):
-    processing_index_global = (config.num_local_models_per_gpu + 1) * gpu_index + processing_index
-    while True:   # scan the queue
-        if not local_model_queue.empty():
-            #print("Processing local queue")  
-            local_model = local_model_queue.get(block=False)            # get a trained local model from the queue
-            flag = partial_model.partial_updates_sum(w_in=local_model)  # add it to partial model
-            if flag == 1:
-                flags[processing_index_global] += 1                     # if enough number of local models are added to partial model
-                global_queue.put(move_to_device(copy.deepcopy(partial_model.state_dict),
-                              torch.device('cpu')), block=True)
-                #print('wait', gpu_index, processing_index)
-                #print(flags[processing_index_global])
-                done.wait()
-                #print('resume', gpu_index, processing_index)
-                partial_model.counter = 0
-        else: 
-            time.sleep(1)  
-        if flags[processing_index_global] >= config.num_steps:
-            break
-    done.wait()
-    #print("close partial model updating process")
-
 
 class GPU_Container:
     def __init__(self, device, config, queue, flags):
@@ -99,7 +80,7 @@ class GPU_Container:
     def update_true_global(self, global_model):
         self.global_model = global_model
         self.true_global = move_to_device(copy.deepcopy(global_model.saved_state_dict), self.device)
-        self.partial_model = Partial_Model(self.device, len(self.user_list_for_processings), self.true_global, self.config)
+        self.partial_model = Partial_Model(self.device, len(self.users), self.true_global, self.config)
 
 
     def launch_gpu(self):
@@ -110,14 +91,9 @@ class GPU_Container:
         for processing_index in range(self.gpu_parallel):
             new_p = mp.Process(target=launch_one_training_process, \
                     args=(gpu_index, processing_index, self.true_global, self.device, self.user_list_for_processings,\
-                            self.local_model_queue, self.config, self.done, self.flags))
+                            self.global_queue, self.config, self.done, self.flags))
             new_p.start()
             local_process_list.append(new_p)
-
-        global_p = mp.Process(target=launch_partial_update_process, \
-                    args=(gpu_index, self.gpu_parallel, self.global_queue, self.local_model_queue, self.partial_model, self.config, self.done, self.flags))
-        global_p.start()
-        local_process_list.append(global_p) 
 
 
         return local_process_list        
