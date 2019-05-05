@@ -3,7 +3,7 @@ layout: default
 title: {{ site.name }}
 ---
 
-<div id="introduction">
+<div id="Introduction">
   <h1>Introduction</h1>
   <h2>Federated Learning</h2>
           <p>
@@ -34,7 +34,8 @@ title: {{ site.name }}
             We notice there is an urgent need of communication-efficient learning framework for deep networks using decentralized data, for example, modern mobile devices (https://arxiv.org/abs/1602.05629). However, in order to learn such model from billions of clients (potentially), an efficient simulation paradigm (through parallel programming) is necessary. Researchers need a testbed to validate performance. It is not feasible to buy 1e4 devices like Google to build such a testing environment, so researchers often use workstation with several GPUs to simulate behaviors of tens of thousands of clients. In practice, numerous local models are trained on several GPUs, and local weights are copied and updated to global model on CPU in every round of training. Since data are distributed in each client, the communication costs dominate in the federated model. And big compute is needed for weights aggregation. The current implementation is serial code, which will read weights from clients one by one, this implementation is very inefficient, the utilization of GPU is lower than 10%. Therefore, we propose a parallel implementation for this model. 
           </p>
 </div>
-     
+
+<div id="Implementation">   
   <h1>Implementation</h1>
     <h2>Model Design</h2>
             <p>
@@ -67,15 +68,20 @@ title: {{ site.name }}
             </ul> 
             </p>
        
+</div>
 
+<div id="Reproducibility"> 
   <h1>Reproducibility</h1>
 
+</div>
+
+<div id="Performance"> 
   <h1>Performance</h1>
+</div>
 
+<div id="Discussion"> 
   <h1>Discussion</h1>
-
-    <p><b>References</b>
-      
+    <h2>References</h2> 
     </p>
 
 </div>
