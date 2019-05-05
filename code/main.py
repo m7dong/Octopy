@@ -8,7 +8,7 @@ from GPUContainer import GPU_Container
 from Config import Config
 import models
 import time
-
+import argparse
 
 def initialize_global_model(config):
     # initialize global model on CPU
@@ -16,9 +16,28 @@ def initialize_global_model(config):
     global_model = Global_Model(state_dict = global_net.state_dict(), capacity = config.num_users)
     return global_model
 
+def update_user_config(user_list, parse, default_user=None):
+    user_config = {}
+    if default_user is None:
+        default_user = {}
+        for group in parse.parser._action_groups:
+            if group.title == 'user_group': 
+                group_dict={a.dest:getattr(parse.parse_args(), a.dest,None) for a in group._group_actions}
+                default_user.update( argparse.Namespace(**group_dict).__dict__ )
+
+    for user in user_list:
+        user_config[user] = default_user
+        # you can add more config here
+        # For Example:
+        # user_config[user]['dir'] = '/home/data' 
+
+    config = parse.parse_args()
+    config.__dict__['users'] = user_config
+    return config
 
 def main():
-    config = Config().parse_args()
+    parse = Config()
+    config = parse.parse_args()
     mp.set_start_method('spawn', force=True)
 
     # initialize global model
@@ -39,10 +58,12 @@ def main():
         done = mp.Event()              # setup up event for queue
         assert len(GPU_Containers) == config.num_gpu
         # specify the users-list for this round
-        GPU_Containers = gpu_update_users(user_list = list(range(int(config.num_users))), gpu_list = GPU_Containers)  
+        GPU_Containers = gpu_update_users(user_list = list(range(int(config.num_users))), gpu_list = GPU_Containers) 
+        config = update_user_config(user_list = list(range(int(config.num_users))), parse = parse, default_user=None)
         local_process_list = []
         # start multiprocessing training for each gpu
         for gpu_launcher in GPU_Containers:
+            gpu_launcher.config = config
             gpu_launcher.update_done(done)   # update event for each round
             gpu_launcher.update_true_global(global_model)   #update global model for each round
             local_process_list += gpu_launcher.launch_gpu()

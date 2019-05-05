@@ -4,27 +4,77 @@ title: {{ site.name }}
 ---
 
 <div id="home">
-  <h1>Blog Posts</h1>
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
-    {% endfor %}
-  </ul>
   <h1>Introduction</h1>
-    <ul class="posts">
-      {% for post in site.posts %}
-        <li><span>Problem Statement</li>
-      {% endfor %}
-    </ul>
-    <ul class="posts">
-      {% for post in site.posts %}
-        <li><span>Why Multiprocessing</li>
-      {% endfor %}
-    </ul><ul class="posts">
-      {% for post in site.posts %}
-        <li><span>Challenges</li>
-      {% endfor %}
-    </ul>
-  <h1>Design</h1>
+  <h2>Federated Learning</h2>
+          <p>
+            Modern mobile devices have access to a wealth of data suitable for learning models, which in turn can greatly improve the user experience on the device. For example, language models can improve speech recognition and text entry, and image models can automatically select good photos. However, this rich data is often privacy sensitive, large in quantity, or both, which may preclude logging to the data center and training there using conventional approaches.
+            Federated Learning is a decentralized model training approach by leaving the training data distributed on the mobile devices, while learning a shared model by aggregating locally-computed updates.    
+          </p>
+          <p>
+            <b>The benefits of Federated Learning:</b>
+            <ul>
+              <li>Privacy: with no direct access to personal data</li>
+              <li>Efficiency: local training on multiple local devices</li>
+              <li>Scalable: Gboard from Google already adopted this framework</li>
+            </ul>
+            
+          </p>
+          <p>
+            <b>The procudure of Federated Learning:</b>
+            <ul>
+              <li>The server opens a new round of training </li>
+              <li>The clients download the latest version of the model from the server and update the model using their local data. Those updates are sent to the server </li>
+              <li>The server gathers all updates and applies Federated Averaging to improve the shared model </li>
+              <li>The shared model is now ready for all clients to download for the next round </li>
+            </ul> 
+          </p>
+   
+  <h2>Problem</h2>
+          <p>
+            We notice there is an urgent need of communication-efficient learning framework for deep networks using decentralized data, for example, modern mobile devices (https://arxiv.org/abs/1602.05629). However, in order to learn such model from billions of clients (potentially), an efficient simulation paradigm (through parallel programming) is necessary. Researchers need a testbed to validate performance. It is not feasible to buy 1e4 devices like Google to build such a testing environment, so researchers often use workstation with several GPUs to simulate behaviors of tens of thousands of clients. In practice, numerous local models are trained on several GPUs, and local weights are copied and updated to global model on CPU in every round of training. Since data are distributed in each client, the communication costs dominate in the federated model. And big compute is needed for weights aggregation. The current implementation is serial code, which will read weights from clients one by one, this implementation is very inefficient, the utilization of GPU is lower than 10%. Therefore, we propose a parallel implementation for this model. 
+          </p>
+     
+  <h1>Implementation</h1>
+    <h2>Model Design</h2>
+            <p>
+              In our simulation paradigm, we allow users to implement their own algorithm/models (in python). Our framework will automatically utilize accessible GPU resources to greatly accelerate the lengthy training process. Since the default GPU utilization ratio is less than 10%, which is far away from its potential, we believe our model will utmostly increase its rate and ease the process of model training. The technical details of the framework are shown in the next section. In order to compare the performance of our model and the baseline (pytorch default settings, without tuning any parameters), we use MNIST and CIFAR10 as our training dataset. We implement the classical feedforward neural network and use stochastic gradient descent for learning. 
+            </p>
+            <figure>
+              <img src="/figures/fed_learn.png" alt="Federated Learning" style="width:auto;">
+              <figcaption>Fig 1. An illustration of Federated Learning</figcaption>
+            </figure>
+              
+            <p>
+              Our design of OctoPy is shown in Fig 2. We first initialize the global model in CPU. The global model is updated at every round of GPU job finished (defined below) until all the data has been used for learning. Then we initialize all accessible GPUs (in this case, let’s say we have n) and create as many as local models in each GPU as possible. The job of local model is to train the model on a batch of data received from dataloader. The number of local models in each GPU depends on the number of threads and GPU memory. Notice that in order to minimize the time required for initialization, we only initialize all the local models once at the very beginning. In addition to local models, in each GPU, we also create a partial global model to receive weights update from the locals. After passing its updates trained on the previous batch of data to the partial global model, each local model will instantaneously receive a new batch of data from dataloader. In order to avoid asynchronization between partial global model and local models, we implement an efficient queue structure to lock the locals. Therefore, each round of GPU job is defined as the time every local model has finished passing its weights to the partial global model. Next, the partial global model will update its weight to the global model in CPU. We estimate that since commute between CPU and GPU is inefficient, our design will greatly shrink the commuting costs. Moreover, in order to accelerate the rate of convergence, when we initiate a new round of training, we update every local model with the weights from the global model trained thus far and use them as starting weight. Similarly, to avoid too often commute between CPU and GPU, we store the latest round of global model in each GPU.
+              To avoid workload imbalance among models, we divide the dataset into same size of batch and load each batch to local model. We estimate that even division of the full dataset to each local model will utilize GPU resources to its best. 
+
+            </p>
+            <figure>
+              <img src="/figures/model_design.png" alt="Model Design" style="width:auto;">
+              <figcaption>Fig2. An illustration of our model </figcaption>
+            </figure>
+  <h2>Parallel Implementation and Programming Model used</h2>
+            <p>
+
+              <ul>
+              <li>Type of application: Compute Intensive </li>
+              <li>Levels of parallelism: Many-core / multi-node, Task Level + Procedure Level, Medium-grained</li>
+              <li>Parallel Execution Model: Distributed-Memory Programming</li>
+              <li>Infrastructure: Odyssey for codes development; a workstation with 8 GPUs for testing</li>
+              <li>Programming model: Pytorch (with Multiprocessing module)</li>
+              <li>Programming language: Python</li>
+            </ul> 
+            </p>
+       
+
+  <h1>Reproducibility</h1>
+
   <h1>Performance</h1>
+
+  <h1>Discussion</h1>
+
+    <p><b>References</b>
+      
+    </p>
+
 </div>

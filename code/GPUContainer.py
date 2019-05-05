@@ -18,7 +18,7 @@ def launch_one_processing(processing_index, true_global, device,
         #print('2: ', ready_model, '|', true_global['fc2.bias'].device)
         ready_model.load_state_dict(true_global)
         #print('3')
-        current_user = User(user_index=user_index, ready_model=ready_model, local_epoch=config.num_epochs)
+        current_user = User(user_index=user_index, ready_model=ready_model, config = config)
         #print('4')
         current_user.local_train()
         #print('5')
