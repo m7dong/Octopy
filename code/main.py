@@ -14,7 +14,7 @@ def initialize_global_model(config):
     # initialize global model on CPU
     global_net = models.__dict__[config.model]()
     #global_model = Global_Model(state_dict = global_net.state_dict(), capacity = config.num_users)
-    global_model = Global_Model(state_dict = global_net.state_dict(), capacity = config.num_gpu)
+    global_model = Global_Model(state_dict = global_net.state_dict(), capacity = config.num_gpu, num_users=config.num_users)
     return global_model
 
 

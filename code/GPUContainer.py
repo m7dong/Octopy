@@ -39,7 +39,7 @@ class GPU_Container:
     def update_true_global(self, global_model):
         self.global_model = global_model
         self.true_global = move_to_device(copy.deepcopy(global_model.saved_state_dict), self.device)
-        self.partial_model = Partial_Model(self.device, len(self.user_list_for_processings), self.true_global, self.config)
+        self.partial_model = Partial_Model(self.device, len(self.users), self.true_global, self.config)
 
 
     def step_training(self, processing_index, step):
