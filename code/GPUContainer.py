@@ -18,7 +18,9 @@ def step_training(processing_index, true_global, device,
         current_user = User(user_index=user_index, ready_model=ready_model, local_epoch=config.num_epochs)
         current_user.local_train(step, config.num_steps)
         #print("Ending local model training for user: ", device, processing_index, user_index)
-        local_model_queue.put(copy.deepcopy(current_user.net.state_dict()), block=True)
+        user_model_copy = copy.deepcopy(move_to_device(current_user.net.state_dict(), device))
+        local_model_queue.put(user_model_copy, block=True)
+        #print('put: ', user_model_copy['fc2.bias'])
         #print("result in local queue for user: ", device, processing_index, user_index)
     print("Ending local model training process: ", device, processing_index)
     print("**Ending local model training process: ", device, processing_index)
@@ -52,8 +54,10 @@ def launch_partial_update_process(gpu_index, processing_index, global_queue, loc
             flag = partial_model.partial_updates_sum(w_in=local_model)  # add it to partial model
             if flag == 1:
                 flags[processing_index_global] += 1                     # if enough number of local models are added to partial model
-                global_queue.put(move_to_device(copy.deepcopy(partial_model.state_dict),
-                              torch.device('cpu')), block=True)
+                partial_model_copy = move_to_device(copy.deepcopy(partial_model.state_dict),
+                              torch.device('cpu'))
+                #print('put to global: ', partial_model_copy['fc2.bias'])
+                global_queue.put(partial_model_copy, block=True)
                 #print('wait', gpu_index, processing_index)
                 #print(flags[processing_index_global])
                 done.wait()
@@ -99,7 +103,7 @@ class GPU_Container:
     def update_true_global(self, global_model):
         self.global_model = global_model
         self.true_global = move_to_device(copy.deepcopy(global_model.saved_state_dict), self.device)
-        self.partial_model = Partial_Model(self.device, len(self.user_list_for_processings), self.true_global, self.config)
+        self.partial_model = Partial_Model(self.device, len(self.users), self.true_global, self.config)
 
 
     def launch_gpu(self):

@@ -28,9 +28,13 @@ def get_avg_state_dict(paths):
 		if idx == 0:
 			avg_state_dict = model_state_dict 
 			for k,v in avg_state_dict.items():
+				if k == 'fc2.bias':
+                        		print(v)
 				avg_state_dict[k] = model_state_dict[k] / len(paths)
 		else: 
 			for k,v in avg_state_dict.items():
+				if k == 'fc2.bias':
+                        		print(v)
 				avg_state_dict[k] += model_state_dict[k] / len(paths)
 
 	return avg_state_dict
@@ -43,11 +47,12 @@ if __name__ == '__main__':
 	global_path = '../checkpoint_global.pth'
 	out = load_checkpoint(global_path)['state_dict']
 	for k, i in true.items():
+		if k == 'fc2.bias':
+			print(('true: ', true[k]))
+			print('out: ', out[k])
 		# if (true[k] == out[k]):
 		# 	print(1)
 		# else:
-		print('true: ', true[k])
-		print('out: ', out[k])
 
 
 
