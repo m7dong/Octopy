@@ -55,9 +55,8 @@ title: {{ site.name }}
               <img src="./figures/model_design.png" alt="Model Design" style="width:auto;">
               <figcaption>Fig2. An illustration of our model </figcaption>
             </figure>
-  <h2>Parallel Implementation and Programming Model used</h2>
+  <h2>Parallel Implementation</h2>
             <p>
-
               <ul>
               <li>Type of application: Compute Intensive </li>
               <li>Levels of parallelism: Many-core / multi-node, Task Level + Procedure Level, Medium-grained</li>
@@ -67,7 +66,44 @@ title: {{ site.name }}
               <li>Programming language: Python</li>
             </ul> 
             </p>
-       
+  <h2>Infrastructure</h2>
+    <p><b>GPU</b>
+      <ul>
+        <li>GPU Model: NVIDIA 1080 TI</li>
+        <li>NVIDIA CUDA® Cores: 3584</li>
+        <li>Boost Clock (MHz): 1582</li>
+        <li>Memory Speed: 11 Gbps</li>
+        <li>Standard Memory Config: 11 GB GDDR5X</li>
+        <li>Memory Interface Width: 352-bit</li>
+        <li>Memory Bandwidth (GB/sec): 484</li>
+      </ul>
+    </p>
+    <p><b>CPU</b>
+      <ul>
+        <li>CPU Model: </li>
+        <li>CPU MHz:</li>
+        <li>CPU cores:</li>
+        <li>L1d cache: </li>
+        <li>L1i cache:</li>
+        <li>L2 cache: </li>
+        <li>L3 cache:</li>
+        <li>Memory: </li>
+        <li>Storage: </li>
+        <li>Operating System: Ubuntu 16.04.4 LTS (debian)</li>
+      </ul> 
+    </p>
+
+  <h2>Advanced Features</h2>
+    <p>
+      <ul>
+        <li>Programming model: use CUDA for GPU programming </li>
+        <li>Infrastructure: use 8 NVIDIA 1080 TI GPU and a CPU</li>
+        <li>Advanced functions: use queue for communication among multiprocess</li>
+      </ul>
+    </p>
+  
+ 
+
 </div>
 
 <div id="Reproducibility"> 
