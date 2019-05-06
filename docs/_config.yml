@@ -1,6 +1,7 @@
 # Setup
 title:        Octopy
 tagline:      A Multiprocessing Federated Learning Simulation Tool
+tagline2:     Team 13 Meng Dong, Xin Dong, Danyun He, Ziao Lin
 baseurl:      "/"
 paginate:     1
 locale:       "en"
