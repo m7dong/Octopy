@@ -20,7 +20,7 @@ title: {{ site.name }}
             
           </p>
           <p>
-            <b>The procudure of Federated Learning:</b>
+            <b>The procedure of Federated Learning:</b>
             <ul>
               <li>The server opens a new round of training </li>
               <li>The clients download the latest version of the model from the server and update the model using their local data. Those updates are sent to the server </li>
@@ -66,6 +66,28 @@ title: {{ site.name }}
               <li>Programming language: Python</li>
             </ul> 
             </p>
+
+  <h2>Advanced Features</h2>
+    <p>
+      <ul>
+        <li>Programming model: use CUDA for GPU programming </li>
+        <li>Infrastructure: use 8 NVIDIA 1080 TI GPU and a CPU</li>
+        <li>Advanced functions: use queue for communication among multiprocess</li>
+      </ul>
+    </p>
+  
+</div>
+
+<div id="Reproducibility"> 
+  <h1>Reproducibility</h1>
+
+</div>
+
+<div id="Performance"> 
+  <h1>Performance</h1>
+  <p>
+   We trained some local models - LeNet using dataset MNIST on 2 NVIDIA 1080 TI GPUs with different number of processors on each GPU. 
+  </p>
   <h2>Infrastructure</h2>
     <p><b>GPU</b>
       <ul>
@@ -80,39 +102,17 @@ title: {{ site.name }}
     </p>
     <p><b>CPU</b>
       <ul>
-        <li>CPU Model: </li>
-        <li>CPU MHz:</li>
-        <li>CPU cores:</li>
-        <li>L1d cache: </li>
-        <li>L1i cache:</li>
-        <li>L2 cache: </li>
-        <li>L3 cache:</li>
-        <li>Memory: </li>
-        <li>Storage: </li>
+        <li>CPU Model: Intel(R) Core(TM) i7-5960X CPU @ 3.00GHz</li>
+        <li>Processor: 15</li>
+        <li>Vendor_id: GenuineIntel</li>
+        <li>CPU MHz: 1200.165</li>    
+        <li>Cache size: 20480 KB</li>  
+        <li>CPU Cores: 8</li>  
         <li>Operating System: Ubuntu 16.04.4 LTS (debian)</li>
       </ul> 
     </p>
+The increases of speedup become slow due to the limit of CPU memory. 
 
-  <h2>Advanced Features</h2>
-    <p>
-      <ul>
-        <li>Programming model: use CUDA for GPU programming </li>
-        <li>Infrastructure: use 8 NVIDIA 1080 TI GPU and a CPU</li>
-        <li>Advanced functions: use queue for communication among multiprocess</li>
-      </ul>
-    </p>
-  
- 
-
-</div>
-
-<div id="Reproducibility"> 
-  <h1>Reproducibility</h1>
-
-</div>
-
-<div id="Performance"> 
-  <h1>Performance</h1>
 </div>
 
 <div id="Discussion"> 
