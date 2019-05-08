@@ -1,5 +1,7 @@
 <p align="center">
 <img src="./docs/figures/LOGO.png" alt="alt text" width="250">
+
+To use the code, run python main.py and check the configuration options in config.py
 </p>
 
 
