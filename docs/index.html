@@ -48,45 +48,38 @@ title: {{ site.name }}
               
             <p>
               Our design of OctoPy is shown in Fig 2. We first initialize the global model in CPU. The global model is updated at every round of GPU job finished (defined below) until all the data has been used for learning. Then we initialize all accessible GPUs (in this case, let’s say we have n) and create as many as local models in each GPU as possible. The job of local model is to train the model on a batch of data received from dataloader. The number of local models in each GPU depends on the number of threads and GPU memory. Notice that in order to minimize the time required for initialization, we only initialize all the local models once at the very beginning. In addition to local models, in each GPU, we also create a partial global model to receive weights update from the locals. After passing its updates trained on the previous batch of data to the partial global model, each local model will instantaneously receive a new batch of data from dataloader. In order to avoid asynchronization between partial global model and local models, we implement an efficient queue structure to lock the locals. Therefore, each round of GPU job is defined as the time every local model has finished passing its weights to the partial global model. Next, the partial global model will update its weight to the global model in CPU. We estimate that since commute between CPU and GPU is inefficient, our design will greatly shrink the commuting costs. Moreover, in order to accelerate the rate of convergence, when we initiate a new round of training, we update every local model with the weights from the global model trained thus far and use them as starting weight. Similarly, to avoid too often commute between CPU and GPU, we store the latest round of global model in each GPU.
-              To avoid workload imbalance among models, we divide the dataset into same size of batch and load each batch to local model. We estimate that even division of the full dataset to each local model will utilize GPU resources to its best. 
-
+              To avoid workload imbalance among models, we divide the dataset into same size of batch and load each batch to local model. We estimate that even division of the full dataset to each local model will utilize GPU resources to its best.
+            </p>
+            <p><b>Main steps:</b>
+              <ol>
+                <li>Global model send its latest version to each GPU</li>
+                <li>In each GPU, local models load the true global model and start training</li>
+                <li>In each GPU, partial global model aggregates the weights from local model when its training complete</li>
+                <li>In each GPU, after aggregating the updated weights from all the local models, partial global model will send the federated average weight back to the global model</li>
+              </ol>  
             </p>
             <figure>
               <img src="./figures/model_design.png" alt="Model Design" style="width:auto;">
-              <figcaption>Fig2. An illustration of our model </figcaption>
+              <figcaption>Fig 2. An illustration of our model </figcaption>
             </figure>
-  <h2>Parallel Implementation</h2>
-            <p>
-              <ul>
-              <li>Type of application: Compute Intensive </li>
-              <li>Levels of parallelism: Many-core, Task Level + Procedure Level, Medium-grained</li>
-              <li>Parallel Execution Model: Distributed-Memory Programming</li>
-              <li>Infrastructure: Odyssey for codes development; a workstation with 8 GPUs for testing</li>
-              <li>Programming model: Pytorch (with Multiprocessing module)</li>
-              <li>Programming language: Python</li>
-            </ul> 
-            </p>
+  
 
   <h2>Advanced Features</h2>
     <p>
       <ul>
-        <li>Programming model: use CUDA for GPU programming </li>
-        <li>Infrastructure: use 8 NVIDIA 1080 TI GPU and a CPU</li>
-        <li>Advanced functions: use queue for communication among multiprocess</li>
+        <li>Use CUDA for GPU programming </li>
+        <li>Extended  from python multiprocessing module</li>
+        <li>Communication among processes: Queue (Manager was not overridden by PyTorch)</li>
+        <li>ASync among processes: signal to pause/restart, clear(), set(), wait()</li>
       </ul>
     </p>
   
 </div>
 
-<div id="Reproducibility"> 
-  <h1>Reproducibility</h1>
-
-</div>
-
 <div id="Performance"> 
   <h1>Performance</h1>
   <p>
-   We trained some local models - LeNet using dataset MNIST on 2 NVIDIA 1080 TI GPUs with different number of processors on each GPU. 
+   <b>Test 1:</b>We trained some local models - LeNet using dataset MNIST on 2 NVIDIA 1080 TI GPUs with different number of processors on each GPU. All our tests could be reproduced using the codes in our github <a href="https://github.com/m7dong/Octopy">repo</a>.
   </p>
   <h2>Infrastructure</h2>
     <p><b>GPU</b>
@@ -104,20 +97,88 @@ title: {{ site.name }}
       <ul>
         <li>CPU Model: Intel(R) Core(TM) i7-5960X CPU @ 3.00GHz</li>
         <li>Processor: 15</li>
-        <li>Vendor_id: GenuineIntel</li>
         <li>CPU MHz: 1200.165</li>    
         <li>Cache size: 20480 KB</li>  
         <li>CPU Cores: 8</li>  
         <li>Operating System: Ubuntu 16.04.4 LTS (debian)</li>
       </ul> 
     </p>
-The increases of speedup become slow due to the limit of CPU memory. 
+  <h2>Results</h2>
+    <p>
+      <figure>
+        <img src="./figures/2gpu_speedup.svg" alt="2gpu speedup" style="width:auto;">
+        <figcaption>Fig 3. Speedup of models trained on 2 GPUs </figcaption>
+      </figure>
+      <figure>
+        <img src="./figures/2gpu_time.svg" alt="2gpu time" style="width:auto;">
+        <figcaption>Fig 4. Running time of models trained on 2 GPUs </figcaption>
+      </figure>
+
+      In Figure 3, with increase of # processors, we can see a linear increase in speedup (from 2 to 6 processors). However, limited by CPU memory, even if we further increase # processors (from 6 to 8 processors), the speedup won’t increase correspondingly. Our hypothesis is that CPU has to transfer caching from its memory to local disks when size becomes relatively large compared with its memory.
+    </p>
+
+  <p>
+   <b>Test 2:</b>We trained some local models - LeNet using dataset MNIST on 8 NVIDIA 1080 TI GPUs with different number of processors on each GPU. To mitigate the limitation by CPU memory, we changed the CPU model. 
+  </p>
+  <h2>Infrastructure</h2>
+    <p><b>CPU</b>
+        <ul>
+          <li>CPU Model: Intel(R) Xeon(R) Platinum 8168 CPU @ 2.70GHz</li>
+          <li>Processor: 95</li>
+          <li>CPU MHz: 1200.982</li>    
+          <li>Cache size: 33792 KB</li>  
+          <li>CPU Cores: 24</li>  
+          <li>Operating System: Ubuntu 16.04.4 LTS (debian)</li>
+        </ul> 
+    </p>
+  <h2>Results</h2>
+  <p>We obtained a better result compared with test 1. 
+    <figure>
+      <img src="./figures/8gpu_speedup.svg" alt="8gpu speedup" style="width:auto;">
+      <figcaption>Fig 5. Speedup of models trained on 8 GPUs </figcaption>
+    </figure>
+    <figure>
+      <img src="./figures/8gpu_time.svg" alt="8gpu time" style="width:auto;">
+      <figcaption>Fig 6. Running time of models trained on 8 GPUs </figcaption>
+    </figure>
+
+    Figure 5 confirms our hypothesis: With larger CPU memory, speedup can still increase linearly even beyond 32 processors. For both Figures 3, 5, we notice the same trend such that with increasing amount of users, the speedup is more obvious. For example, in Figure 5, compared between 200 (blue) and 2000 users (red), with increase of # processors, the speedup of the larger one (2000) increases linearly, while the speedup of the smaller one (200) doesn’t change significantly. The phenomenon is also consistent with our hypothesis: With more training data available, the parallelizable part of codes will save more time (compared with serial part). We can see that, with our implementation, we can greatly increase GPU utilization (plot 2) to more than 5 fold. The utilization rate of GPU can increase from 10% to over 50% now.
+  </p>
 
 </div>
 
 <div id="Discussion"> 
   <h1>Discussion</h1>
-    <h2>References</h2> 
+    <h2>Speedup</h2>
+    <p>
+      With increase amount of processors, we can see a linear increase in speedup (from 2 to 6 processors). However, limited by CPU memory, even if we further increase number of processors (from 6 to 8 processors), the speedup won’t increase correspondingly. Our hypothesis is that CPU has to transfer caching from its memory to local disks when size becomes relatively large compared with its memory. Figures C,D confirms our hypothesis: With larger CPU memory, speedup can still increase linearly even beyond 32 processors. 
     </p>
+
+    <h2>Scalability</h2>
+    <p>
+      With increasing amount of users, the speedup is more obvious. The phenomenon is also consistent with our hypothesis: With more training data available, the parallelizable part of codes will save more time (compared with serial part).
+    </p>
+
+    <h2>Improvement</h2>
+    <p>
+      We can see that, with our implementation, we can greatly increase GPU utilization (plot 2) to more than 5 fold. The utilization rate of GPU can increase from 10% to over 50% now.
+    </p>
+    <h2>Challenges</h2>
+    <p>
+      To deal with pytorch dataloader, we need to adjust batch size to fit CPU cache size. Otherwise, if the batch of data size is overflow, it would be written to disk. This would consume a large amount of time to transfer data from CPU to GPU. We mitigate the initialization overhead by avoiding repeatedly initialize local models in GPU each round. To mitigate communication overhead between GPU and CPU, we only send the model weights instead of sending the whole model. 
+    </p>
+
+    <h2>Future Works</h2>
+      <p> In the future, we will design the API for this library and write up the documents. We would also implementation this model with multi-nodes. More test cases could be added to handle errors (e.g. deal with incomplete models).  
+      </p>
+
+    <h2>References</h2> 
+    <p>
+      <ul>
+        <li>McMahan, H. B., Moore, E., Ramage, D., & Hampson, S. (2016). Communication-efficient learning of deep networks from decentralized data. arXiv preprint arXiv:1602.05629.</li>
+        <li>Konečný, J., McMahan, H. B., Yu, F. X., Richtárik, P., Suresh, A. T., & Bacon, D. (2016). Federated learning: Strategies for improving communication efficiency. arXiv preprint arXiv:1610.05492.</li>
+      </ul>
+    </p>
+    
 
 </div>
